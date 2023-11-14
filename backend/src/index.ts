@@ -41,7 +41,6 @@ app.get("/ads", (req, res) => {
 });
 
 app.post("/ads", (req, res) => {
-  console.log(req.body);
   ads.push(req.body);
   res.send(req.body);
 });
