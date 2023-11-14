@@ -5,7 +5,7 @@ const port = 4000;
 
 app.use(express.json());
 
-const ads = [
+let ads = [
   {
     id: 1,
     title: "Bike to sell",
@@ -40,9 +40,45 @@ app.get("/ads", (req, res) => {
   res.send(ads);
 });
 
+app.get("/ads/:id", (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  res.send(ads.find((ad) => ad.id === id));
+});
+
 app.post("/ads", (req, res) => {
   ads.push(req.body);
   res.send(req.body);
+});
+
+app.delete("/ads/:id", (req, res) => {
+  ads = ads.filter((ad) => req.params.id !== ad.id.toString());
+
+  /*
+  for (let i = 0; i < ads.length; i++) {
+    if (req.params.id === ads[i].id.toString()) ads.splice(i, 1);
+  }
+  */
+
+  /*
+  ads.splice(
+    ads.findIndex((ad) => ad.id.toString() === req.params.id),
+    1
+  );
+  */
+
+  res.sendStatus(204);
+});
+
+app.patch("/ads/:id", (req, res) => {
+  console.log("id of ad to update ", req.params.id);
+  console.log("props to update ", req.body);
+
+  ads = ads.map((ad) => {
+    if (ad.id.toString() === req.params.id) return { ...ad, ...req.body };
+    return ad;
+  });
+
+  res.send(ads.find((ad) => ad.id.toString() === req.params.id));
 });
 
 app.listen(port, () => {
