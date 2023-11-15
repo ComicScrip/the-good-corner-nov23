@@ -61,6 +61,17 @@ app.delete("/ads/:id", (req: Request, res: Response) => {
   });
 });
 
+app.get("/ads/:id", (req: Request, res: Response) => {
+  db.get("SELECT * FROM ad WHERE id = ?", [req.params.id], (err, row) => {
+    if (err) {
+      console.log(err);
+      return res.sendStatus(500);
+    }
+    if (!row) return res.sendStatus(404);
+    res.send(row);
+  });
+});
+
 app.patch("/ads/:id", (req: Request, res: Response) => {
   db.get("SELECT * FROM ad WHERE id = ?", [req.params.id], (err, row) => {
     if (err) {

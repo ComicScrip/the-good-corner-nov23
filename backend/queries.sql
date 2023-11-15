@@ -9,7 +9,7 @@ CREATE TABLE ad
 	price REAL,
     picture VARCHAR(255),
     location VARCHAR(100),
-	createdAt DATE
+	createdAt DATE('NOW')
 	category VARCHAR(100)
 );
 
