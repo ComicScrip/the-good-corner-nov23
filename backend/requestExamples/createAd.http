@@ -2,7 +2,7 @@ POST http://localhost:4000/ads
 Content-Type: application/json
 
 {
-    "title": "Bike 2",
+    "title": "Bike 3",
     "description": "My bike is blue, working fine. I'm selling it because I've got a new one",
     "owner": "bike.seller@gmail.com",
     "price": 100,
