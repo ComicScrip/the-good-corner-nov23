@@ -1,7 +1,9 @@
 import express from "express";
-
+import sqlite3 from "sqlite3";
 const app = express();
 const port = 4000;
+
+const db = new sqlite3.Database("./the_good_corner.sqlite");
 
 app.use(express.json());
 
@@ -37,7 +39,12 @@ app.get("/", (req, res) => {
 });
 
 app.get("/ads", (req, res) => {
-  res.send(ads);
+  db.all("SELECT * FROM ad", (err, rows) => {
+    if (err) {
+      console.log(err);
+      res.sendStatus(500);
+    } else res.send(rows);
+  });
 });
 
 app.get("/ads/:id", (req, res) => {
@@ -46,8 +53,25 @@ app.get("/ads/:id", (req, res) => {
 });
 
 app.post("/ads", (req, res) => {
-  ads.push(req.body);
-  res.send(req.body);
+  const stmt = db.prepare(
+    "INSERT INTO ad (title, description, owner, price, picture, location, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)"
+  );
+
+  stmt.run(
+    [
+      req.body.title,
+      req.body.description,
+      req.body.owner,
+      req.body.price,
+      req.body.picture,
+      req.body.location,
+      req.body.createdAt,
+    ],
+    (err: any) => {
+      if (err) res.sendStatus(500);
+      else res.send(req.body);
+    }
+  );
 });
 
 app.delete("/ads/:id", (req, res) => {
