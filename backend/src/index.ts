@@ -30,7 +30,7 @@ app.post("/ads", async (req: Request, res: Response) => {
     */
     const newAd = Ad.create(req.body);
     const errors = await validate(newAd);
-    if (errors) return res.status(422).send({ errors });
+    if (errors.length > 0) return res.status(422).send({ errors });
     const newAdWithId = await newAd.save();
     res.send(newAdWithId);
   } catch (err) {
@@ -66,8 +66,9 @@ app.patch("/ads/:id", async (req: Request, res: Response) => {
   try {
     const adToUpdate = await Ad.findOneBy({ id: parseInt(req.params.id, 10) });
     if (!adToUpdate) return res.sendStatus(404);
-    await Ad.update(parseInt(req.params.id, 10), req.body);
     await Ad.merge(adToUpdate, req.body);
+    const errors = await validate(adToUpdate);
+    if (errors.length > 0) return res.status(422).send({ errors });
     res.send(await adToUpdate.save());
   } catch (err) {
     console.log(err);
