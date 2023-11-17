@@ -3,15 +3,72 @@ import express, { Request, Response } from "express";
 import { validate } from "class-validator";
 import db from "./db";
 import Ad from "./entities/Ad";
+import Category from "./entities/Category";
+import Tag from "./entities/Tag";
+import { In, Like } from "typeorm";
 
 const app = express();
 const port = 4000;
 
 app.use(express.json());
 
-app.get("/ads", async (req: Request, res: Response) => {
+app.get("/tags", async (req: Request, res: Response) => {
   try {
-    const ads = await Ad.find();
+    const { name } = req.query;
+    const tags = await Tag.find({
+      where: { name: name ? Like(`%${name}%`) : undefined },
+    });
+    res.send(tags);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
+app.get("/categories", async (req: Request, res: Response) => {
+  const { name } = req.query;
+
+  try {
+    const categories = await Category.find({
+      relations: {
+        ads: true,
+      },
+      where: { name: name ? Like(`%${name}%`) : undefined },
+    });
+    res.send(categories);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
+app.get("/ads", async (req: Request, res: Response) => {
+  const { tagIds, categoryId } = req.query;
+  const tIds =
+    typeof tagIds === "string" && tagIds.length > 0
+      ? tagIds.split(",").map((t) => parseInt(t, 10))
+      : undefined;
+
+  const catId =
+    typeof categoryId === "string" && categoryId.length > 0
+      ? parseInt(categoryId, 10)
+      : undefined;
+
+  try {
+    const ads = await Ad.find({
+      relations: {
+        category: true,
+        tags: true,
+      },
+      where: {
+        tags: {
+          id: tIds ? In(tIds) : undefined,
+        },
+        category: {
+          id: catId,
+        },
+      },
+    });
     res.send(ads);
   } catch (err) {
     console.log(err);
@@ -39,6 +96,32 @@ app.post("/ads", async (req: Request, res: Response) => {
   }
 });
 
+app.post("/categories", async (req: Request, res: Response) => {
+  try {
+    const newCategory = Category.create(req.body);
+    const errors = await validate(newCategory);
+    if (errors.length > 0) return res.status(422).send({ errors });
+    const newCategoryWithId = await newCategory.save();
+    res.send(newCategoryWithId);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
+app.post("/tags", async (req: Request, res: Response) => {
+  try {
+    const newTag = Tag.create(req.body);
+    const errors = await validate(newTag);
+    if (errors.length > 0) return res.status(422).send({ errors });
+    const newTagWithId = await newTag.save();
+    res.send(newTagWithId);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
 app.delete("/ads/:id", async (req: Request, res: Response) => {
   try {
     const adToDelete = await Ad.findOneBy({ id: parseInt(req.params.id, 10) });
@@ -51,9 +134,26 @@ app.delete("/ads/:id", async (req: Request, res: Response) => {
   }
 });
 
+app.delete("/tags/:id", async (req: Request, res: Response) => {
+  try {
+    const tagToDelete = await Tag.findOneBy({
+      id: parseInt(req.params.id, 10),
+    });
+    if (!tagToDelete) return res.sendStatus(404);
+    await tagToDelete.remove();
+    res.sendStatus(204);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
 app.get("/ads/:id", async (req: Request, res: Response) => {
   try {
-    const ad = await Ad.findOneBy({ id: parseInt(req.params.id, 10) });
+    const ad = await Ad.findOne({
+      where: { id: parseInt(req.params.id, 10) },
+      relations: { category: true, tags: true },
+    });
     if (!ad) return res.sendStatus(404);
     res.send(ad);
   } catch (err) {
