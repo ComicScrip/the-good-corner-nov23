@@ -7,5 +7,7 @@ Content-Type: application/json
     "owner": "bike.seller@gmail.com",
     "price": 100,
     "picture": "https://images.lecho.be/view?iid=dc:113129565&context=ONLINE&ratio=16/9&width=640&u=1508242455000",
-    "location": "Paris"
+    "location": "Paris",
+    "category": 3,
+    "tags": [{"id": 2}, {"id": 3}]
 }
