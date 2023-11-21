@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 export type AdCardProps = {
   price: number;
   title: string;

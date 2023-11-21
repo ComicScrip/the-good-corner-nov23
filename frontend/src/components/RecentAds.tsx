@@ -19,7 +19,7 @@ export default function RecentAds() {
   ];
 
   return (
-    <main className="main-content">
+    <>
       <h2>Annonces récentes</h2>
       <section className="recent-ads">
         {ads.map((ad, idx) => (
@@ -69,6 +69,6 @@ export default function RecentAds() {
           </a>
         </div>
       </section>
-    </main>
+    </>
   );
 }
