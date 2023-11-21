@@ -1,0 +1,199 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  background-color: #f5f5f5;
+}
+
+h1 {
+  margin: 0;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-bottom: 1px solid lightgray;
+  padding: 10px;
+  background-color: white;
+}
+
+.main-menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  color: #ffa41b;
+}
+
+.categories-navigation {
+  font-size: 12px;
+  font-weight: bold;
+  color: #666;
+  padding: 16px 10px 6px;
+  white-space: nowrap;
+  overflow-x: scroll;
+}
+
+.category-navigation-link {
+  text-decoration: unset;
+  color: inherit;
+}
+
+.button {
+  min-width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 2px solid #ffa41b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #ffa41b;
+  background-color: white;
+  cursor: pointer;
+}
+
+.logo {
+  border: none;
+}
+
+.button-primary {
+  background-color: #ffa41b;
+  color: white;
+}
+
+.text-field-with-button {
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+  gap: 4px;
+}
+
+.main-search-field {
+  width: 100%;
+  min-width: 120px;
+  max-width: 360px;
+  flex-grow: 1;
+}
+
+.text-field {
+  height: 40px;
+  background-color: white;
+  padding: 8px;
+  border: 2px solid #ffa41b;
+  border-radius: 8px;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.link-button {
+  text-decoration: none;
+}
+
+.desktop-long-label {
+  display: none;
+}
+
+.main-content {
+  max-width: 832px;
+  padding: 0 16px;
+  margin: 120px auto 48px;
+}
+
+.recent-ads {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.ad-card-container {
+  border-radius: 8px;
+  border: 1px solid lightgray;
+  color: inherit;
+  background-color: white;
+}
+
+.ad-card-link {
+  text-decoration: inherit;
+  color: inherit;
+}
+
+.ad-card-image {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.ad-card-text {
+  padding: 12px;
+  font-size: 18px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.ad-card-title {
+  font-weight: bold;
+}
+
+.ad-details-image-container {
+  margin-inline-start: -24px;
+  margin-inline-end: -24px;
+}
+
+.ad-details-image {
+  width: 100%;
+}
+
+.ad-details {
+  display: grid;
+  gap: 24px;
+}
+
+@media screen and (min-width: 720px) {
+  .mobile-short-label {
+    display: none;
+  }
+  .desktop-long-label {
+    display: initial;
+  }
+
+  .categories-navigation {
+    padding-top: 14px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .ad-details-image-container {
+    margin-inline-start: unset;
+    margin-inline-end: unset;
+  }
+
+  .ad-details {
+    grid-template-columns: 1fr 388px;
+  }
+}
+
+.ad-details-info {
+  display: grid;
+  gap: 12px;
+  align-content: baseline;
+}
+
+.ad-details-price {
+  font-weight: bold;
+}
+
+.separator {
+  width: 100%;
+  height: 1px;
+  background-color: lightgray;
+  border: none;
+}
