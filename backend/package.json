@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "start": "ts-node-dev ./src/index.ts"
+    "start": "ts-node-dev ./src/index.ts",
+    "resetDB": "ts-node-dev src/resetDb.ts"
   },
   "keywords": [
     "ads"
