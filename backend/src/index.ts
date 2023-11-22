@@ -6,11 +6,13 @@ import Ad from "./entities/Ad";
 import Category from "./entities/Category";
 import Tag from "./entities/Tag";
 import { In, Like } from "typeorm";
+import cors from "cors";
 
 const app = express();
 const port = 4000;
 
 app.use(express.json());
+app.use(cors());
 
 app.get("/tags", async (req: Request, res: Response) => {
   try {
