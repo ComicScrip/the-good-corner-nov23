@@ -46,15 +46,7 @@ app.get("/categories", async (req: Request, res: Response) => {
 
 app.get("/ads", async (req: Request, res: Response) => {
   const { tagIds, categoryId } = req.query;
-  const tIds =
-    typeof tagIds === "string" && tagIds.length > 0
-      ? tagIds.split(",").map((t) => parseInt(t, 10))
-      : undefined;
-
-  const catId =
-    typeof categoryId === "string" && categoryId.length > 0
-      ? parseInt(categoryId, 10)
-      : undefined;
+  const title = req.query.title as string | undefined;
 
   try {
     const ads = await Ad.find({
@@ -64,10 +56,14 @@ app.get("/ads", async (req: Request, res: Response) => {
       },
       where: {
         tags: {
-          id: tIds ? In(tIds) : undefined,
+          id:
+            typeof tagIds === "string" && tagIds.length > 0
+              ? In(tagIds.split(",").map((t) => parseInt(t, 10)))
+              : undefined,
         },
+        title: title ? Like(`%${title}%`) : undefined,
         category: {
-          id: catId,
+          id: categoryId ? parseInt(categoryId as string, 10) : undefined,
         },
       },
     });

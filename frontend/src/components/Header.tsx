@@ -1,24 +1,68 @@
+import { Category } from "@/types";
+import axios from "axios";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import qs from "query-string";
+
 export default function Header() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const router = useRouter();
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:4000/categories")
+      .then((res) => setCategories(res.data))
+      .catch(console.error);
+  }, []);
+
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    if (typeof router.query.title === "string") {
+      setSearch(router.query.title);
+    }
+  }, [router.query.title]);
+
+  const searchParams = qs.parse(window.location.search) as any;
+
   return (
     <header className="header">
       <div className="main-menu">
         <h1>
-          <a href="/" className="button logo link-button">
+          <Link href="/" className="button logo link-button">
             <span className="mobile-short-label">TGC</span>
-            <span className="desktop-long-label">THE GOOD CORNER</span>
-          </a>
+            <span className="desktop-long-label text-xl">THE GOOD CORNER</span>
+          </Link>
         </h1>
-        <form className="text-field-with-button">
-          <input className="text-field main-search-field" type="search" />
+        <form
+          className="text-field-with-button"
+          onSubmit={(e) => {
+            e.preventDefault();
+            router.push(
+              `/search?${qs.stringify({
+                ...searchParams,
+                title: search,
+              })}`
+            );
+          }}
+        >
+          <input
+            className="text-field main-search-field text-gray-700"
+            type="search"
+            value={search}
+            placeholder="Rechercher.."
+            onChange={(e) => setSearch(e.target.value)}
+          />
           <button className="button button-primary">
             <svg
               aria-hidden="true"
               width="16"
+              transform="scale(-1, 1)"
+              fill="currentColor"
               height="16"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="-50 -50 530 550"
-              transform="scale(-1, 1)"
-              fill="currentColor"
               xmlSpace="preserve"
               className="styled__BaseIcon-sc-1jsm4qr-0 llmHhT"
             >
@@ -26,63 +70,37 @@ export default function Header() {
             </svg>
           </button>
         </form>
-        <a href="/newAd" className="button link-button">
+        <Link href="/newAd" className="button link-button">
           <span className="mobile-short-label">Publier</span>
           <span className="desktop-long-label">Publier une annonce</span>
-        </a>
+        </Link>
       </div>
-      <nav className="categories-navigation">
-        <a href="" className="category-navigation-link">
-          Ameublement
-        </a>{" "}
-        •
-        <a href="" className="category-navigation-link">
-          Électroménager
-        </a>{" "}
-        •
-        <a href="" className="category-navigation-link">
-          Photographie
-        </a>{" "}
-        •
-        <a href="" className="category-navigation-link">
-          Informatique
-        </a>{" "}
-        •
-        <a href="" className="category-navigation-link">
-          Téléphonie{" "}
-        </a>{" "}
-        •
-        <a href="" className="category-navigation-link">
-          Vélos
-        </a>{" "}
-        •
-        <a href="" className="category-navigation-link">
-          Véhicules
-        </a>{" "}
-        •
-        <a href="" className="category-navigation-link">
-          Sport
-        </a>{" "}
-        •
-        <a href="" className="category-navigation-link">
-          Habillement
-        </a>{" "}
-        •
-        <a href="" className="category-navigation-link">
-          Bébé
-        </a>{" "}
-        •
-        <a href="" className="category-navigation-link">
-          Outillage
-        </a>{" "}
-        •
-        <a href="" className="category-navigation-link">
-          Services{" "}
-        </a>{" "}
-        •
-        <a href="" className="category-navigation-link">
-          Vacances
-        </a>
+      <nav className="flex pl-2 h-[54px]">
+        {categories.map((cat) => {
+          const [firstLetter, ...resetOfCatName] = cat.name.split("");
+          const catName = firstLetter.toUpperCase() + resetOfCatName.join("");
+          const isActive = router.query.categoryId === cat.id.toString();
+
+          return (
+            <div
+              className={`p-2 rounded-lg mt-3 cursor-pointer ${
+                isActive ? "bg-[#ffa41b] text-white" : ""
+              }`}
+              onClick={() => {
+                router.push(
+                  "/search?" +
+                    qs.stringify({
+                      ...searchParams,
+                      categoryId: isActive ? undefined : cat.id,
+                    })
+                );
+              }}
+              key={catName}
+            >
+              {catName}
+            </div>
+          );
+        })}
       </nav>
     </header>
   );
