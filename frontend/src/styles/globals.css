@@ -1,5 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 * {
   box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
@@ -93,6 +102,7 @@ h1 {
   border-radius: 8px;
   font-size: 12px;
   font-family: inherit;
+  outline: none;
 }
 
 .link-button {
@@ -106,7 +116,12 @@ h1 {
 .main-content {
   max-width: 832px;
   padding: 0 16px;
-  margin: 120px auto 48px;
+  margin: 110px auto 48px;
+  background-color: #f5f5f5;
+}
+
+#__next {
+  background-color: #f5f5f5;
 }
 
 .recent-ads {

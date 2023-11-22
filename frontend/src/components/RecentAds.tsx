@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
-import AdCard, { AdCardProps } from "./AdCard";
+import AdCard from "./AdCard";
 import axios from "axios";
+import { Ad } from "@/types";
 
 export default function RecentAds() {
-  const [totalPrice, setTotalPrice] = useState(0);
-
-  const [ads, setAds] = useState<AdCardProps[]>([]);
+  const [ads, setAds] = useState<Ad[]>([]);
 
   useEffect(() => {
     axios
-      .get<AdCardProps[]>("http://localhost:4000/ads")
+      .get<Ad[]>("http://localhost:4000/ads")
       .then((res) => {
         setAds(res.data);
       })
@@ -17,29 +16,14 @@ export default function RecentAds() {
   }, []);
 
   return (
-    <>
-      <h2>Annonces récentes</h2>
-      <p>prix total : {totalPrice}</p>
-      <section className="recent-ads">
+    <div className="pt-6">
+      <h2 className="text-2xl mb-6">Annonces récentes</h2>
+
+      <section className="flex flex-wrap pb-24">
         {ads.map((ad) => (
-          <div key={ad.id}>
-            <AdCard
-              id={ad.id}
-              title={ad.title}
-              price={ad.price}
-              picture={ad.picture}
-              link={ad.link}
-            />
-            <button
-              onClick={() => {
-                setTotalPrice((oldTotal) => oldTotal + ad.price);
-              }}
-            >
-              Ajouter
-            </button>
-          </div>
+          <AdCard key={ad.id} ad={ad} link={`/ads/${ad.id}`} />
         ))}
       </section>
-    </>
+    </div>
   );
 }
