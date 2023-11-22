@@ -1,28 +1,19 @@
 import { useEffect, useState } from "react";
 import AdCard, { AdCardProps } from "./AdCard";
+import axios from "axios";
 
 export default function RecentAds() {
-  const ads: AdCardProps[] = [
-    {
-      link: "/ads/table",
-      pictureUrl: "/images/table.webp",
-      title: "Table",
-      price: 120,
-    },
-    {
-      link: "/ads/dame-jeanne",
-      pictureUrl: "/images/dame-jeanne.webp",
-      title: "Dame-jeanne",
-      price: 75,
-    },
-  ];
-
   const [totalPrice, setTotalPrice] = useState(0);
 
-  console.log("rerender");
+  const [ads, setAds] = useState<AdCardProps[]>([]);
 
   useEffect(() => {
-    setTotalPrice(1);
+    axios
+      .get<AdCardProps[]>("http://localhost:4000/ads")
+      .then((res) => {
+        setAds(res.data);
+      })
+      .catch(console.error);
   }, []);
 
   return (
@@ -30,12 +21,13 @@ export default function RecentAds() {
       <h2>Annonces récentes</h2>
       <p>prix total : {totalPrice}</p>
       <section className="recent-ads">
-        {ads.map((ad, idx) => (
-          <div key={idx}>
+        {ads.map((ad) => (
+          <div key={ad.id}>
             <AdCard
+              id={ad.id}
               title={ad.title}
               price={ad.price}
-              pictureUrl={ad.pictureUrl}
+              picture={ad.picture}
               link={ad.link}
             />
             <button
