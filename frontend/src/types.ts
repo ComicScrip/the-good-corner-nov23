@@ -21,4 +21,5 @@ export type AdDetails = Ad & {
   description: string;
   createdAt: string;
   category: Category;
+  tags: Tag[];
 };

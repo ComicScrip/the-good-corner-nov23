@@ -28,8 +28,22 @@ export default function AdDetails() {
             "Chargement..."
           ) : (
             <div className="">
-              <div className="flex justify-between items-center">
-                <h1 className="text-3xl">{ad.title}</h1>
+              <div className=" flex justify-between items-start md:items-center">
+                <div className="flex items-start md:items-center flex-col md:flex-row">
+                  <h1 className="text-3xl">{ad.title}</h1>
+
+                  <div className="md:ml-4 mt-4 md:mt-0">
+                    {ad.tags.map((t) => (
+                      <span
+                        className="bg-slate-100 rounded-badge p-2 mr-2 text-gray-600 border-slate-300 border "
+                        key={t.id}
+                      >
+                        {t.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
                 <p className="text-2xl">{ad.price} €</p>
               </div>
 
