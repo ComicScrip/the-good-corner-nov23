@@ -19,6 +19,7 @@ app.get("/tags", async (req: Request, res: Response) => {
     const { name } = req.query;
     const tags = await Tag.find({
       where: { name: name ? Like(`%${name}%`) : undefined },
+      order: { id: "desc" },
     });
     res.send(tags);
   } catch (err) {
@@ -36,6 +37,7 @@ app.get("/categories", async (req: Request, res: Response) => {
         ads: true,
       },
       where: { name: name ? Like(`%${name}%`) : undefined },
+      order: { id: "desc" },
     });
     res.send(categories);
   } catch (err) {
@@ -199,6 +201,23 @@ app.patch("/ads/:id", async (req: Request, res: Response) => {
     const errors = await validate(adToUpdate);
     if (errors.length > 0) return res.status(422).send({ errors });
     res.send(await adToUpdate.save());
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
+app.patch("/tags/:id", async (req: Request, res: Response) => {
+  try {
+    const tagToUpdate = await Tag.findOneBy({
+      id: parseInt(req.params.id, 10),
+    });
+    if (!tagToUpdate) return res.sendStatus(404);
+    await Category.merge(tagToUpdate, req.body);
+    const errors = await validate(tagToUpdate);
+    if (errors.length !== 0) return res.status(422).send({ errors });
+
+    res.send(await tagToUpdate.save());
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
