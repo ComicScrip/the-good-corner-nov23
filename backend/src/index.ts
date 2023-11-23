@@ -107,6 +107,37 @@ app.post("/categories", async (req: Request, res: Response) => {
   }
 });
 
+app.patch("/categories/:id", async (req: Request, res: Response) => {
+  try {
+    const catToUpdate = await Category.findOneBy({
+      id: parseInt(req.params.id, 10),
+    });
+    if (!catToUpdate) return res.sendStatus(404);
+    await Category.merge(catToUpdate, req.body);
+    const errors = await validate(catToUpdate);
+    if (errors.length !== 0) return res.status(422).send({ errors });
+
+    res.send(await catToUpdate.save());
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
+app.delete("/categories/:id", async (req: Request, res: Response) => {
+  try {
+    const catToDelete = await Category.findOneBy({
+      id: parseInt(req.params.id, 10),
+    });
+    if (!catToDelete) return res.sendStatus(404);
+    await catToDelete.remove();
+    res.sendStatus(204);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
 app.post("/tags", async (req: Request, res: Response) => {
   try {
     const newTag = Tag.create(req.body);
