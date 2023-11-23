@@ -12,11 +12,10 @@ export default function AdDetails() {
   const [ad, setAd] = useState<AdDetailsType>();
 
   useEffect(() => {
-    if (typeof ad === "undefined")
-      axios
-        .get<AdDetailsType>(`http://localhost:4000/ads/${id}`)
-        .then((res) => setAd(res.data))
-        .catch(console.error);
+    axios
+      .get<AdDetailsType>(`http://localhost:4000/ads/${id}`)
+      .then((res) => setAd(res.data))
+      .catch(console.error);
   }, [id]);
 
   return (

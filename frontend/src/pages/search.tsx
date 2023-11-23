@@ -37,7 +37,7 @@ export default function Search() {
 
       <div className="pt-6 pb-20 flex flex-wrap">
         {ads.map((ad) => (
-          <AdCard key={ad.title} ad={ad} link={`/ads/${ad.id}`} />
+          <AdCard key={ad.id} ad={ad} link={`/ads/${ad.id}`} />
         ))}
       </div>
     </Layout>
