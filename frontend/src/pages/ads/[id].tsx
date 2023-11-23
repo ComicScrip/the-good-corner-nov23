@@ -14,10 +14,11 @@ export default function AdDetails() {
   const [ad, setAd] = useState<AdDetailsType>();
 
   useEffect(() => {
-    axios
-      .get<AdDetailsType>(`http://localhost:4000/ads/${id}`)
-      .then((res) => setAd(res.data))
-      .catch(console.error);
+    if (id)
+      axios
+        .get<AdDetailsType>(`http://localhost:4000/ads/${id}`)
+        .then((res) => setAd(res.data))
+        .catch(console.error);
   }, [id]);
 
   return (
