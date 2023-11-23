@@ -68,6 +68,10 @@ app.get("/ads", async (req: Request, res: Response) => {
           id: categoryId ? parseInt(categoryId as string, 10) : undefined,
         },
       },
+      order: {
+        createdAt: "desc",
+      },
+      take: 10,
     });
     res.send(ads);
   } catch (err) {

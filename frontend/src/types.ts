@@ -20,4 +20,5 @@ export type AdDetails = Ad & {
   owner: string;
   description: string;
   createdAt: string;
+  category: Category;
 };
