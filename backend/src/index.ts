@@ -80,6 +80,29 @@ app.get("/ads", async (req: Request, res: Response) => {
   }
 });
 
+app.get("/autocompleteAdTitle", async (req: Request, res: Response) => {
+  const title = req.query.title as string | undefined;
+
+  try {
+    const ads = await Ad.find({
+      select: {
+        title: true,
+      },
+      where: {
+        title: title ? Like(`%${title}%`) : undefined,
+      },
+      order: {
+        title: "asc",
+      },
+      take: 10,
+    });
+    res.send(ads.map((a) => a.title));
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(500);
+  }
+});
+
 app.post("/ads", async (req: Request, res: Response) => {
   try {
     /*
