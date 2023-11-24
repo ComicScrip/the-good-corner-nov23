@@ -17,7 +17,7 @@ export default function Header() {
       .catch(console.error);
   }, []);
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(router.query.title || "");
 
   useEffect(() => {
     if (typeof router.query.title === "string") {
@@ -38,14 +38,7 @@ export default function Header() {
 
   const [showAutoComplete, setShowAutoComplete] = useState(false);
 
-  useEffect(() => {
-    router.push(
-      `/search?${qs.stringify({
-        ...searchParams,
-        title: search,
-      })}`
-    );
-  }, [search]);
+  const [selectedAutoCompleteIndex, setSelectedAutoCompleteIndex] = useState(0);
 
   return (
     <header className="header">
@@ -56,7 +49,10 @@ export default function Header() {
             <span className="desktop-long-label text-xl">THE GOOD CORNER</span>
           </Link>
         </h1>
-        <form className="text-field-with-button">
+        <form
+          className="text-field-with-button"
+          onSubmit={(e) => e.preventDefault()}
+        >
           <div className="w-full flex justify-center">
             <div className="min-w-[200px] max-w-[400px] flex flex-col relative">
               <input
@@ -64,9 +60,37 @@ export default function Header() {
                 type="search"
                 value={search}
                 placeholder="Rechercher.."
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSelectedAutoCompleteIndex(0);
+                  setSearch(e.target.value);
+                  if (e.target.value || router.pathname === "/search")
+                    router.push(
+                      `/search?${qs.stringify({
+                        ...searchParams,
+                        title: e.target.value,
+                      })}`
+                    );
+                }}
                 onFocus={() => setShowAutoComplete(true)}
-                onBlur={() => setTimeout(() => setShowAutoComplete(false), 150)}
+                onBlur={() =>
+                  setTimeout(() => {
+                    setShowAutoComplete(false);
+                  }, 150)
+                }
+                onKeyDown={({ key }) => {
+                  // arrow up/down button should select next/previous list element
+                  if (key === "ArrowUp") {
+                    setSelectedAutoCompleteIndex((i) => (i < 1 ? 0 : i - 1));
+                  } else if (key === "ArrowDown") {
+                    setSelectedAutoCompleteIndex((i) =>
+                      i >= autoCompleteOptions.length - 1
+                        ? autoCompleteOptions.length - 1
+                        : i + 1
+                    );
+                  } else if (key === "Enter") {
+                    setSearch(autoCompleteOptions[selectedAutoCompleteIndex]);
+                  }
+                }}
               />
 
               <div
@@ -83,7 +107,9 @@ export default function Header() {
                   .filter((o) => o !== search)
                   .map((o, idx) => (
                     <div
-                      className="cursor-pointer p-1 px-3 border-b border-gray-200 text-gray-600 hover:bg-slate-50"
+                      className={`cursor-pointer p-1 px-3 border-b border-gray-200 text-gray-600 hover:bg-slate-50 ${
+                        selectedAutoCompleteIndex === idx ? "bg-slate-100" : ""
+                      }`}
                       key={idx}
                       onClick={() => setSearch(o)}
                     >
