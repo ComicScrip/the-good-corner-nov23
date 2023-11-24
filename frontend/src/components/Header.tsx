@@ -1,4 +1,4 @@
-import { Category } from "@/types";
+import { Ad, Category } from "@/types";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -7,7 +7,7 @@ import qs from "query-string";
 
 export default function Header() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [autoCompleteOptions, setAutoCompleteOptions] = useState<string[]>([]);
+  const [autoCompleteOptions, setAutoCompleteOptions] = useState<Ad[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -17,22 +17,30 @@ export default function Header() {
       .catch(console.error);
   }, []);
 
+  console.log(router.query.title);
   const [search, setSearch] = useState(router.query.title || "");
 
   useEffect(() => {
-    if (typeof router.query.title === "string") {
-      setSearch(router.query.title);
-    }
-  }, [router.query.title]);
+    if (router.isReady) setSearch(router.query.title || "");
+  }, [router.isReady]);
 
   useEffect(() => {
+    console.log("effect", search, router.pathname, router.query.title);
+    if ((router.pathname === "/search" || search.length) && router.isReady)
+      router.push(
+        `/search?${qs.stringify({
+          ...searchParams,
+          title: search || router.query.title,
+        })}`
+      );
+
     if (search.length)
       axios
-        .get(`http://localhost:4000/autocompleteAdTitle?title=${search}`)
+        .get<Ad[]>(`http://localhost:4000/autocompleteAdTitle?title=${search}`)
         .then((res) => setAutoCompleteOptions(res.data))
         .catch(console.error);
     else setAutoCompleteOptions([]);
-  }, [search]);
+  }, [search, router.isReady]);
 
   const searchParams = qs.parse(window.location.search) as any;
 
@@ -60,16 +68,10 @@ export default function Header() {
                 type="search"
                 value={search}
                 placeholder="Rechercher.."
+                autoFocus
                 onChange={(e) => {
                   setSelectedAutoCompleteIndex(0);
                   setSearch(e.target.value);
-                  if (e.target.value || router.pathname === "/search")
-                    router.push(
-                      `/search?${qs.stringify({
-                        ...searchParams,
-                        title: e.target.value,
-                      })}`
-                    );
                 }}
                 onFocus={() => setShowAutoComplete(true)}
                 onBlur={() =>
@@ -88,7 +90,9 @@ export default function Header() {
                         : i + 1
                     );
                   } else if (key === "Enter") {
-                    setSearch(autoCompleteOptions[selectedAutoCompleteIndex]);
+                    router.push(
+                      `/ads/${autoCompleteOptions[selectedAutoCompleteIndex].id}`
+                    );
                   }
                 }}
               />
@@ -98,28 +102,46 @@ export default function Header() {
                 style={{
                   visibility:
                     showAutoComplete &&
-                    autoCompleteOptions.filter((o) => o !== search).length > 0
+                    autoCompleteOptions.filter((o) => o.title !== search)
+                      .length > 0
                       ? "initial"
                       : "hidden",
                 }}
               >
                 {autoCompleteOptions
-                  .filter((o) => o !== search)
+                  .filter((o) => o.title !== search)
                   .map((o, idx) => (
                     <div
                       className={`cursor-pointer p-1 px-3 border-b border-gray-200 text-gray-600 hover:bg-slate-50 ${
                         selectedAutoCompleteIndex === idx ? "bg-slate-100" : ""
                       }`}
                       key={idx}
-                      onClick={() => setSearch(o)}
+                      onClick={() =>
+                        router.push(
+                          `/ads/${autoCompleteOptions[selectedAutoCompleteIndex].id}`
+                        )
+                      }
                     >
-                      {o}
+                      {o.title}
                     </div>
                   ))}
               </div>
             </div>
 
-            <button className="button button-primary ml-1">
+            <button
+              type="button"
+              className="button button-primary ml-1"
+              onClick={() => {
+                console.log("search");
+
+                router.push(
+                  `/search?${qs.stringify({
+                    ...searchParams,
+                    title: search,
+                  })}`
+                );
+              }}
+            >
               <svg
                 aria-hidden="true"
                 width="16"

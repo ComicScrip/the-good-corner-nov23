@@ -87,6 +87,7 @@ app.get("/autocompleteAdTitle", async (req: Request, res: Response) => {
     const ads = await Ad.find({
       select: {
         title: true,
+        id: true,
       },
       where: {
         title: title ? Like(`%${title}%`) : undefined,
@@ -96,7 +97,7 @@ app.get("/autocompleteAdTitle", async (req: Request, res: Response) => {
       },
       take: 10,
     });
-    res.send(ads.map((a) => a.title));
+    res.send(ads);
   } catch (err) {
     console.log(err);
     res.sendStatus(500);
