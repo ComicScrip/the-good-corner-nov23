@@ -7,6 +7,20 @@ import Category from "./entities/Category";
 import Tag from "./entities/Tag";
 import { In, Like } from "typeorm";
 import cors from "cors";
+import { ApolloServer } from "@apollo/server";
+import { startStandaloneServer } from "@apollo/server/standalone";
+import { buildSchema } from "type-graphql";
+import AdResolver from "./resolvers/AdResolver";
+import TagResolver from "./resolvers/TagResolver";
+
+buildSchema({ resolvers: [AdResolver, TagResolver] }).then((schema) => {
+  const server = new ApolloServer({ schema });
+  startStandaloneServer(server, {
+    listen: { port: 4001 },
+  }).then(({ url }) => {
+    console.log(`server ready on ${url}`);
+  });
+});
 
 const app = express();
 const port = 4000;
