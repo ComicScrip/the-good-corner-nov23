@@ -20,6 +20,7 @@ export default class Tag extends BaseEntity {
   @Field()
   name: string;
 
+  @Field(() => [Ad])
   @ManyToMany(() => Ad, (ad) => ad.tags)
   ads: Ad[];
 }
