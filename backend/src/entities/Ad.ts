@@ -1,80 +1,83 @@
 import {
-  BaseEntity,
   Entity,
+  BaseEntity,
   PrimaryGeneratedColumn,
-  Column,
   CreateDateColumn,
+  Column,
   ManyToOne,
-  ManyToMany,
   JoinTable,
+  ManyToMany,
 } from "typeorm";
 import { Length, Min } from "class-validator";
+import { ObjectType, Field, Int, InputType } from "type-graphql";
 import Category from "./Category";
 import Tag from "./Tag";
-import { ObjectType, Field, InputType, Float, Int } from "type-graphql";
+import { ObjectId } from "../types";
 
 @Entity()
 @ObjectType()
 export default class Ad extends BaseEntity {
-  @Field()
   @PrimaryGeneratedColumn()
+  @Field(() => Int)
   id: number;
 
+  @Column({ length: 50 })
   @Field()
-  @Length(5, 100, {
-    message: "Le titre doit contenir entre 5 et 100 caractères",
-  })
-  @Column({ length: 100 })
   title: string;
 
+  @Column({ nullable: true, type: "text" })
   @Field()
-  @Column({ type: "text", nullable: true })
   description: string;
 
+  @Column()
   @Field()
-  @Column({ length: 100 })
   owner: string;
 
-  @Field()
-  @Min(0, { message: "le prix doit etre positif" })
   @Column({ type: "float" })
+  @Field()
   price: number;
 
+  @Column()
   @Field()
-  @Column({ length: 255 })
-  picture: string;
-
-  @Field()
-  @Column({ length: 100 })
   location: string;
 
+  @Column()
   @Field()
-  @CreateDateColumn()
-  createdAt: Date;
+  picture: string;
 
-  @Field(() => Category)
+  @CreateDateColumn()
+  @Field()
+  createdAt: string;
+
   @ManyToOne(() => Category, (c) => c.ads, {
     cascade: true,
     onDelete: "CASCADE",
   })
+  @Field()
   category: Category;
 
-  @Field(() => [Tag])
   @JoinTable()
   @ManyToMany(() => Tag, (t) => t.ads, {
     cascade: true,
   })
+  @Field(() => [Tag])
   tags: Tag[];
 }
+
 @InputType()
-export class AdInput {
+export class NewAdInput {
   @Field()
+  @Length(5, 50, { message: "Le titre doit contenir entre 5 et 50 caractères" })
   title: string;
+
+  @Field()
+  description: string;
 
   @Field()
   owner: string;
 
-  @Field(() => Float)
+  @Field()
+  @Min(0, { message: "le prix doit etre positif" })
   price: number;
 
   @Field()
@@ -83,6 +86,40 @@ export class AdInput {
   @Field()
   picture: string;
 
-  @Field(() => Int)
-  category: number;
+  @Field(() => ObjectId)
+  category: ObjectId;
+
+  @Field(() => [ObjectId], { nullable: true })
+  tags?: ObjectId[];
+}
+@InputType()
+export class UpdateAdInput {
+  @Field({ nullable: true })
+  @Length(5, 50, { message: "Le titre doit contenir entre 5 et 50 caractères" })
+  title?: string;
+
+  @Field({ nullable: true })
+  description?: string;
+
+  @Field({ nullable: true })
+  owner?: string;
+
+  @Field({ nullable: true })
+  @Min(0, { message: "le prix doit etre positif" })
+  price?: number;
+
+  @Field({ nullable: true })
+  city?: string;
+
+  @Field({ nullable: true })
+  picture?: string;
+
+  @Field(() => ObjectId, { nullable: true })
+  category?: ObjectId;
+
+  @Field(() => [ObjectId], { nullable: true })
+  tags?: ObjectId[];
+
+  @Field({ nullable: true })
+  location?: string;
 }

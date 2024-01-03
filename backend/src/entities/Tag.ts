@@ -1,32 +1,40 @@
 import {
-  BaseEntity,
   Entity,
-  PrimaryGeneratedColumn,
   Column,
-  OneToMany,
+  PrimaryGeneratedColumn,
+  BaseEntity,
   ManyToMany,
 } from "typeorm";
 import Ad from "./Ad";
-import { ObjectType, Field, InputType } from "type-graphql";
+import { Length } from "class-validator";
+import { ObjectType, Field, Int, InputType } from "type-graphql";
 
 @Entity()
 @ObjectType()
 export default class Tag extends BaseEntity {
-  @Field()
   @PrimaryGeneratedColumn()
+  @Field(() => Int)
   id: number;
 
-  @Column({ length: 100 })
+  @Column()
+  @Length(2, 50)
   @Field()
   name: string;
 
-  @Field(() => [Ad])
   @ManyToMany(() => Ad, (ad) => ad.tags)
   ads: Ad[];
 }
 
 @InputType()
-export class TagInput {
+export class NewTagInput {
   @Field()
+  @Length(2, 30, { message: "Le nom doit contenir entre 2 et 30 caractères" })
   name: string;
+}
+
+@InputType()
+export class UpdateTagInput {
+  @Field({ nullable: true })
+  @Length(2, 30, { message: "Le nom doit contenir entre 2 et 30 caractères" })
+  name?: string;
 }
