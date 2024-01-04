@@ -4,8 +4,37 @@ import { FormEvent, useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import Select from "react-select";
+import { gql, useMutation } from "@apollo/client";
+
+const CREATE_AD_MUTATION = gql`
+  mutation CreateAd($data: NewAdInput!) {
+    createAd(data: $data) {
+      id
+    }
+  }
+`;
 
 export default function NewAd() {
+  const [createAd] = useMutation<
+    { createAd: { id: number } },
+    {
+      data: {
+        title: string;
+        description: string;
+        owner: string;
+        price: number;
+        location: string;
+        picture: string;
+        category: {
+          id: number;
+        };
+        tags: {
+          id: number;
+        }[];
+      };
+    }
+  >(CREATE_AD_MUTATION);
+
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
@@ -33,12 +62,12 @@ export default function NewAd() {
     const formData = new FormData(e.target as HTMLFormElement);
     const formJSON: any = Object.fromEntries(formData.entries());
     formJSON.price = parseFloat(formJSON.price);
+    formJSON.category = { id: parseInt(formJSON.category, 10) };
     formJSON.tags = selectedTags.map((t) => ({ id: t.id }));
 
-    axios
-      .post("http://localhost:4000/ads", formJSON)
+    createAd({ variables: { data: formJSON } })
       .then((res) => {
-        router.push(`/ads/${res.data.id}`);
+        router.push(`/ads/${res.data?.createAd.id}`);
       })
       .catch(console.error);
   };

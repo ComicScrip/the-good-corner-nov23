@@ -7,19 +7,47 @@ import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { MapPinIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { gql, useQuery } from "@apollo/client";
+
+const GET_AD_DETAIL = gql`
+  query GetAdById($adId: Int!) {
+    getAdById(adId: $adId) {
+      id
+      title
+      description
+      owner
+      price
+      location
+      picture
+      tags {
+        id
+        name
+      }
+    }
+  }
+`;
+
+type AdDetails = {
+  id: number;
+  title: string;
+  description: string;
+  picture: string;
+  location: string;
+  owner: string;
+  price: number;
+  tags: { id: number; name: string }[];
+};
 
 export default function AdDetails() {
   const router = useRouter();
   const { id } = router.query;
-  const [ad, setAd] = useState<AdDetailsType>();
 
-  useEffect(() => {
-    if (id)
-      axios
-        .get<AdDetailsType>(`http://localhost:4000/ads/${id}`)
-        .then((res) => setAd(res.data))
-        .catch(console.error);
-  }, [id]);
+  const { data, error } = useQuery<{ getAdById: AdDetails }>(GET_AD_DETAIL, {
+    variables: { adId: parseInt(id as string) },
+    skip: typeof id === "undefined",
+  });
+
+  const ad = data?.getAdById;
 
   return (
     <Layout pageTitle={ad?.title ? ad.title + " - TGC" : "The Good Corner"}>
