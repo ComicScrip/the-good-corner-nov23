@@ -8,41 +8,13 @@ import { MapPinIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { gql, useQuery } from "@apollo/client";
-
-const GET_AD_DETAIL = gql`
-  query GetAdById($adId: Int!) {
-    getAdById(adId: $adId) {
-      id
-      title
-      description
-      owner
-      price
-      location
-      picture
-      tags {
-        id
-        name
-      }
-    }
-  }
-`;
-
-type AdDetails = {
-  id: number;
-  title: string;
-  description: string;
-  picture: string;
-  location: string;
-  owner: string;
-  price: number;
-  tags: { id: number; name: string }[];
-};
+import { useAdDetailsQuery } from "@/graphql/generated/schema";
 
 export default function AdDetails() {
   const router = useRouter();
   const { id } = router.query;
 
-  const { data, error } = useQuery<{ getAdById: AdDetails }>(GET_AD_DETAIL, {
+  const { data } = useAdDetailsQuery({
     variables: { adId: parseInt(id as string) },
     skip: typeof id === "undefined",
   });

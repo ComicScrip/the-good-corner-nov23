@@ -1,0 +1,5 @@
+mutation CreateAd($data: NewAdInput!) {
+  createAd(data: $data) {
+    id
+  }
+}

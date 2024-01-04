@@ -1,26 +1,8 @@
+import { useRecentAdsQuery } from "@/graphql/generated/schema";
 import AdCard from "./AdCard";
-import { gql, useQuery } from "@apollo/client";
-
-const GET_RECENT_ADS = gql`
-  query Ads {
-    ads {
-      id
-      title
-      price
-      picture
-    }
-  }
-`;
-
-type RecentAd = {
-  id: number;
-  title: string;
-  price: number;
-  picture: string;
-};
 
 export default function RecentAds() {
-  const { data } = useQuery<{ ads: RecentAd[] }>(GET_RECENT_ADS);
+  const { data } = useRecentAdsQuery();
   const ads = data?.ads || [];
 
   return (
