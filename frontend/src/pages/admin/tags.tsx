@@ -3,21 +3,24 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { Tag } from "@/types";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import {
+  useAllTagsQuery,
+  useCreateTagMutation,
+  useDeleteTagMutation,
+  useUpdateTagMutation,
+} from "@/graphql/generated/schema";
 
 export default function AdminTags() {
-  const [tags, setTags] = useState<Tag[]>([]);
+  const { data, refetch } = useAllTagsQuery();
+  const tags = data?.tags || [];
 
-  useEffect(() => {
-    axios
-      .get<Tag[]>("http://localhost:4000/tags")
-      .then((res) => setTags(res.data))
-      .catch(console.error);
-  }, []);
+  const [createTag] = useCreateTagMutation();
+  const [deleteTag] = useDeleteTagMutation();
 
   const handleDeleteTag = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:4000/tags/${id}`);
-      setTags((tagList) => tagList?.filter((t) => t.id !== id));
+      await deleteTag({ variables: { tagId: id } });
+      refetch();
     } catch (e) {
       console.error(e);
     }
@@ -33,11 +36,9 @@ export default function AdminTags() {
           const json = Object.fromEntries(data.entries());
 
           try {
-            const newTag = (
-              await axios.post("http://localhost:4000/tags", json)
-            ).data;
+            await createTag({ variables: { data: json as any } });
+            refetch();
             form.reset();
-            setTags((oldList) => [newTag, ...oldList]);
           } catch (err) {
             console.error(err);
           }

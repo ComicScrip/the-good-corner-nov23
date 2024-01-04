@@ -1,0 +1,3 @@
+mutation DeleteTag($tagId: Float!) {
+  deleteTag(tagId: $tagId)
+}

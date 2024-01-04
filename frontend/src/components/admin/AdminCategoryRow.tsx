@@ -6,6 +6,7 @@ import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
+import { useUpdateCategoryMutation } from "@/graphql/generated/schema";
 
 interface AdminCategoryRowProps {
   category: Category;
@@ -18,12 +19,12 @@ export default function AdminCategoryRow({
   const [isEditing, setIsEditing] = useState(false);
 
   const [displayedName, setDisplayedName] = useState(name);
-
+  const [UpdateCategory] = useUpdateCategoryMutation();
   const handleSave = async () => {
     try {
       if (displayedName) {
-        await axios.patch(`http://localhost:4000/categories/${id}`, {
-          name: displayedName,
+        await UpdateCategory({
+          variables: { data: { name: displayedName }, categoryId: id },
         });
         setIsEditing(false);
       }

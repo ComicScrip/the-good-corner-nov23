@@ -6,6 +6,7 @@ import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
+import { useUpdateTagMutation } from "@/graphql/generated/schema";
 
 interface AdminTagRowProps {
   tag: Tag;
@@ -15,6 +16,8 @@ export default function AdminTagRow({
   tag: { id, name },
   handleDeleteTag,
 }: AdminTagRowProps) {
+  const [updateTag] = useUpdateTagMutation();
+
   const [isEditing, setIsEditing] = useState(false);
 
   const [displayedName, setDisplayedName] = useState(name);
@@ -22,10 +25,10 @@ export default function AdminTagRow({
   const handleSave = async () => {
     try {
       if (displayedName) {
-        await axios.patch(`http://localhost:4000/tags/${id}`, {
-          name: displayedName,
-        });
-        setIsEditing(false);
+        await updateTag({
+          variables: { tagId: id, data: { name: displayedName } },
+        }),
+          setIsEditing(false);
       }
     } catch (err) {
       console.error(err);

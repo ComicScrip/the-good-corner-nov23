@@ -8,23 +8,19 @@ import { gql, useMutation } from "@apollo/client";
 import {
   useAllTagsQuery,
   useCreateAdMutation,
+  useCategoriesQuery,
 } from "@/graphql/generated/schema";
 
 export default function NewAd() {
   const [createAd] = useCreateAdMutation();
-  const [categories, setCategories] = useState<Category[]>([]);
 
-  useEffect(() => {
-    axios
-      .get<Category[]>("http://localhost:4000/categories")
-      .then((res) => setCategories(res.data))
-      .catch(console.error);
-  }, []);
-
-  const { data } = useAllTagsQuery();
-  const tags = data?.tags || [];
+  const { data: tagsData } = useAllTagsQuery();
+  const tags = tagsData?.tags || [];
 
   const tagOptions = tags;
+
+  const { data } = useCategoriesQuery();
+  const categories = data?.categories || [];
 
   const router = useRouter();
 
@@ -44,6 +40,8 @@ export default function NewAd() {
   };
 
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+
+  console.log({ categories });
 
   return (
     <Layout pageTitle="Creation d'une annonce">
