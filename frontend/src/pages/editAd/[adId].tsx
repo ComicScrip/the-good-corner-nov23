@@ -4,26 +4,31 @@ import { useRouter } from "next/router";
 import { FormEvent, useEffect, useState } from "react";
 import axios from "axios";
 import Select from "react-select";
+import {
+  useAllTagsQuery,
+  useCategoriesQuery,
+  useAdDetailsQuery,
+  useUpdateAdMutation,
+} from "@/graphql/generated/schema";
 
 export default function EditAd() {
   const router = useRouter();
   const { adId } = router.query;
-  const [ad, setAd] = useState<AdDetails>();
-  const [categories, setCategories] = useState<Category[]>([]);
 
-  useEffect(() => {
-    axios
-      .get<AdDetails>(`http://localhost:4000/ads/${adId}`)
-      .then((res) => setAd(res.data))
-      .catch(console.error);
-  }, [adId]);
+  const { data: tagsData } = useAllTagsQuery();
+  const tags = tagsData?.tags || [];
 
-  useEffect(() => {
-    axios
-      .get<Category[]>("http://localhost:4000/categories")
-      .then((res) => setCategories(res.data))
-      .catch(console.error);
-  }, []);
+  const { data: categoriesData } = useCategoriesQuery();
+  const categories = categoriesData?.categories || [];
+
+  const { data } = useAdDetailsQuery({
+    variables: { adId: parseInt(adId as string) },
+    skip: typeof adId === "undefined",
+  });
+
+  const ad = data?.getAdById;
+
+  const [updateAd] = useUpdateAdMutation();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,23 +36,21 @@ export default function EditAd() {
     const formJSON: any = Object.fromEntries(formData.entries());
     formJSON.price = parseFloat(formJSON.price);
     formJSON.tags = ad?.tags.map((t) => ({ id: t.id }));
+    formJSON.category = { id: parseInt(formJSON.category) };
 
-    axios
-      .patch(`http://localhost:4000/ads/${ad?.id}`, formJSON)
+    updateAd({
+      variables: {
+        adId: (typeof adId === "string"
+          ? parseInt(adId, 10)
+          : undefined) as number,
+        data: formJSON,
+      },
+    })
       .then((res) => {
-        router.push(`/ads/${res.data.id}`);
+        router.push(`/ads/${res.data?.updateAd.id}`);
       })
       .catch(console.error);
   };
-
-  const [tags, setTags] = useState<Tag[]>([]);
-
-  useEffect(() => {
-    axios
-      .get<Tag[]>("http://localhost:4000/tags")
-      .then((res) => setTags(res.data))
-      .catch(console.error);
-  }, []);
 
   return (
     <Layout pageTitle={ad?.title ? ad.title + " - TGC" : "The Good Corner"}>

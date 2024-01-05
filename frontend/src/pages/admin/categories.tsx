@@ -20,13 +20,15 @@ export default function AdminCategories() {
   const categories = data?.categories || [];
   const [deleteCategory] = useDeleteCategoryMutation();
 
-  const handleDeleteCategory = async (id: number) => {
+  const handleDeleteCategory = async (idOfCatToDelete: number) => {
     try {
-      await deleteCategory({ variables: { categoryId: id } });
+      await deleteCategory({ variables: { categoryId: idOfCatToDelete } });
       client.writeQuery<CategoriesQuery>({
         query: CategoriesDocument,
         data: {
-          categories: categories.filter((category) => category.id != id),
+          categories: categories.filter(
+            (category) => category.id != idOfCatToDelete
+          ),
         },
       });
     } catch (e) {

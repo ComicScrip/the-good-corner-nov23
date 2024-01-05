@@ -7,6 +7,10 @@ query AdDetails($adId: Int!) {
     price
     location
     picture
+    category {
+      id
+      name
+    }
     tags {
       id
       name

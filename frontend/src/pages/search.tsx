@@ -4,18 +4,24 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Ad } from "@/types";
 import AdCard from "@/components/AdCard";
+import { useSearchAdsQuery } from "@/graphql/generated/schema";
 
 export default function Search() {
   const router = useRouter();
+  const categoryId =
+    typeof router.query.categoryId === "string"
+      ? parseInt(router.query.categoryId)
+      : undefined;
+  const titleOfAds =
+    typeof router.query.title === "string" ? router.query.title : undefined;
+  const { data } = useSearchAdsQuery({
+    variables: {
+      categoryId,
+      title: titleOfAds,
+    },
+  });
 
-  const [ads, setAds] = useState<Ad[]>([]);
-
-  useEffect(() => {
-    axios
-      .get<Ad[]>(`http://localhost:4000/ads${window.location.search}`)
-      .then((res) => setAds(res.data))
-      .catch(console.error);
-  }, [router.query.title, router.query.categoryId]);
+  const ads = data?.ads || [];
 
   return (
     <Layout pageTitle="recherche - TGC">
