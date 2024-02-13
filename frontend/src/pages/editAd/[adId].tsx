@@ -173,7 +173,7 @@ export default function EditAd() {
                 value={ad.tags}
                 closeMenuOnSelect={false}
                 onChange={(tags) => {
-                  setAd({ ...ad, tags: tags as any });
+                  //setAd({ ...ad, tags: tags as any });
                 }}
               />
             </div>
