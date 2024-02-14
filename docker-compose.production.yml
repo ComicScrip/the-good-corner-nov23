@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    depends_on:
+      db:
+        condition: service_healthy
+    build:
+      context: backend
+      dockerfile: Dockerfile.production
+    ports:
+      - 4001:4001
+    volumes:
+      - ./backend/src:/app/src
+
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile.production
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend/src:/app/src
