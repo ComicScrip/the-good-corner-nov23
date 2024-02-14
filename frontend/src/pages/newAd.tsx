@@ -9,6 +9,7 @@ import {
   useCategoriesQuery,
 } from "@/graphql/generated/schema";
 import axios from "axios";
+import uploadFile from "@/helpers/uploadFile";
 
 export default function NewAd() {
   const [imageURL, setImageURL] = useState("");
@@ -124,14 +125,11 @@ export default function NewAd() {
             <input
               type="file"
               onChange={(e) => {
-                console.log(e.target.files);
-                const data = new FormData() as any;
-                data.file = e.target.files?.[0];
-                axios
-                  .post("http://localhost:8000/uploads", data)
-                  .then((res) => setImageURL(res.data.url));
+                if (e.target.files?.[0])
+                  uploadFile(e.target.files?.[0]).then(setImageURL);
               }}
             />
+            {imageURL && <img src={imageURL} alt="picture" />}
           </div>
         </div>
 

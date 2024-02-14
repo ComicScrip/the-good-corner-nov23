@@ -7,13 +7,17 @@ import {
   useCategoriesQuery,
   useAdDetailsQuery,
   useUpdateAdMutation,
+  AdDetailsDocument,
 } from "@/graphql/generated/schema";
 import { Tag } from "@/types";
-import axios from "axios";
+import uploadFile from "@/helpers/uploadFile";
 
 export default function EditAd() {
   const router = useRouter();
-  const { adId } = router.query;
+  const { adId: adIdStr } = router.query;
+
+  const adId = parseInt(adIdStr as string);
+
   const [imageURL, setImageURL] = useState("");
 
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -25,9 +29,12 @@ export default function EditAd() {
   const categories = categoriesData?.categories || [];
 
   const { data } = useAdDetailsQuery({
-    variables: { adId: parseInt(adId as string) },
+    variables: { adId },
     skip: typeof adId === "undefined",
-    onCompleted: (data) => setSelectedTags(data.getAdById.tags),
+    onCompleted: ({ getAdById: { tags, picture } }) => {
+      setSelectedTags(tags);
+      setImageURL(picture);
+    },
   });
 
   const ad = data?.getAdById;
@@ -43,16 +50,10 @@ export default function EditAd() {
     formJSON.category = { id: parseInt(formJSON.category) };
 
     updateAd({
-      variables: {
-        adId: (typeof adId === "string"
-          ? parseInt(adId, 10)
-          : undefined) as number,
-        data: formJSON,
-      },
+      variables: { adId, data: formJSON },
+      refetchQueries: [{ query: AdDetailsDocument, variables: { adId } }],
     })
-      .then((res) => {
-        router.push(`/ads/${res.data?.updateAd.id}`);
-      })
+      .then((res) => router.push(`/ads/${res.data?.updateAd.id}`))
       .catch(console.error);
   };
 
@@ -132,7 +133,6 @@ export default function EditAd() {
                 <span className="label-text">Image</span>
               </label>
               <input
-                defaultValue={ad?.picture}
                 type="url"
                 name="picture"
                 id="picture"
@@ -145,14 +145,11 @@ export default function EditAd() {
               <input
                 type="file"
                 onChange={(e) => {
-                  console.log(e.target.files);
-                  const data = new FormData() as any;
-                  data.file = e.target.files?.[0];
-                  axios
-                    .post("http://localhost:8000/uploads", data)
-                    .then((res) => setImageURL(res.data.url));
+                  if (e.target.files?.[0])
+                    uploadFile(e.target.files?.[0]).then(setImageURL);
                 }}
               />
+              {imageURL && <img src={imageURL} alt="picture" />}
             </div>
           </div>
 
