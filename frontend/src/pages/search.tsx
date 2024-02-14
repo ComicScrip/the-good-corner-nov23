@@ -1,8 +1,5 @@
 import Layout from "@/components/Layout";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Ad } from "@/types";
 import AdCard from "@/components/AdCard";
 import { useSearchAdsQuery } from "@/graphql/generated/schema";
 

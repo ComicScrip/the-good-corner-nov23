@@ -208,6 +208,13 @@ export type CreateTagMutationVariables = Exact<{
 
 export type CreateTagMutation = { __typename?: 'Mutation', createTag: { __typename?: 'Tag', name: string } };
 
+export type DeleteAdMutationVariables = Exact<{
+  adId: Scalars['Float'];
+}>;
+
+
+export type DeleteAdMutation = { __typename?: 'Mutation', deleteAd: string };
+
 export type DeleteCategoryMutationVariables = Exact<{
   categoryId: Scalars['Float'];
 }>;
@@ -449,6 +456,37 @@ export function useCreateTagMutation(baseOptions?: Apollo.MutationHookOptions<Cr
 export type CreateTagMutationHookResult = ReturnType<typeof useCreateTagMutation>;
 export type CreateTagMutationResult = Apollo.MutationResult<CreateTagMutation>;
 export type CreateTagMutationOptions = Apollo.BaseMutationOptions<CreateTagMutation, CreateTagMutationVariables>;
+export const DeleteAdDocument = gql`
+    mutation DeleteAd($adId: Float!) {
+  deleteAd(adId: $adId)
+}
+    `;
+export type DeleteAdMutationFn = Apollo.MutationFunction<DeleteAdMutation, DeleteAdMutationVariables>;
+
+/**
+ * __useDeleteAdMutation__
+ *
+ * To run a mutation, you first call `useDeleteAdMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteAdMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteAdMutation, { data, loading, error }] = useDeleteAdMutation({
+ *   variables: {
+ *      adId: // value for 'adId'
+ *   },
+ * });
+ */
+export function useDeleteAdMutation(baseOptions?: Apollo.MutationHookOptions<DeleteAdMutation, DeleteAdMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteAdMutation, DeleteAdMutationVariables>(DeleteAdDocument, options);
+      }
+export type DeleteAdMutationHookResult = ReturnType<typeof useDeleteAdMutation>;
+export type DeleteAdMutationResult = Apollo.MutationResult<DeleteAdMutation>;
+export type DeleteAdMutationOptions = Apollo.BaseMutationOptions<DeleteAdMutation, DeleteAdMutationVariables>;
 export const DeleteCategoryDocument = gql`
     mutation DeleteCategory($categoryId: Float!) {
   deleteCategory(categoryId: $categoryId)

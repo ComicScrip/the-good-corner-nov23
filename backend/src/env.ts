@@ -6,4 +6,5 @@ export default load({
   DB_USER: String,
   DB_PASS: String,
   DB_NAME: String,
+  SERVER_PORT: Number,
 });

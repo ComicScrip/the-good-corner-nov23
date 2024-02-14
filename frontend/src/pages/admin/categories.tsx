@@ -1,15 +1,11 @@
 import AdminCategoryRow from "@/components/admin/AdminCategoryRow";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Category } from "@/types";
-import axios from "axios";
-import { useEffect, useState } from "react";
 import {
   CategoriesDocument,
   CategoriesQuery,
   useCategoriesQuery,
   useCreateCategoryMutation,
   useDeleteCategoryMutation,
-  useUpdateCategoryMutation,
 } from "@/graphql/generated/schema";
 import client from "@/graphql/client";
 

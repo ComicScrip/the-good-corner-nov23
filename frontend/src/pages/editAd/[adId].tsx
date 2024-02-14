@@ -1,8 +1,6 @@
 import Layout from "@/components/Layout";
-import { AdDetails, Category, Tag } from "@/types";
 import { useRouter } from "next/router";
-import { FormEvent, useEffect, useState } from "react";
-import axios from "axios";
+import { FormEvent, useState } from "react";
 import Select from "react-select";
 import {
   useAllTagsQuery,
@@ -10,10 +8,13 @@ import {
   useAdDetailsQuery,
   useUpdateAdMutation,
 } from "@/graphql/generated/schema";
+import { Tag } from "@/types";
 
 export default function EditAd() {
   const router = useRouter();
   const { adId } = router.query;
+
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   const { data: tagsData } = useAllTagsQuery();
   const tags = tagsData?.tags || [];
@@ -24,6 +25,7 @@ export default function EditAd() {
   const { data } = useAdDetailsQuery({
     variables: { adId: parseInt(adId as string) },
     skip: typeof adId === "undefined",
+    onCompleted: (data) => setSelectedTags(data.getAdById.tags),
   });
 
   const ad = data?.getAdById;
@@ -170,10 +172,10 @@ export default function EditAd() {
                 isMulti
                 name="tags"
                 id="tags"
-                value={ad.tags}
+                value={selectedTags}
                 closeMenuOnSelect={false}
                 onChange={(tags) => {
-                  //setAd({ ...ad, tags: tags as any });
+                  setSelectedTags(tags as any);
                 }}
               />
             </div>

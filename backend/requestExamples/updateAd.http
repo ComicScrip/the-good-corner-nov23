@@ -1,6 +1,0 @@
-PATCH http://localhost:4000/ads/2
-Content-Type: application/json
-
-{
-    "title": "super"
-}
