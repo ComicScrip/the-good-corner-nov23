@@ -9,10 +9,12 @@ import {
   useUpdateAdMutation,
 } from "@/graphql/generated/schema";
 import { Tag } from "@/types";
+import axios from "axios";
 
 export default function EditAd() {
   const router = useRouter();
   const { adId } = router.query;
+  const [imageURL, setImageURL] = useState("");
 
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
@@ -134,9 +136,22 @@ export default function EditAd() {
                 type="url"
                 name="picture"
                 id="picture"
+                value={imageURL || ad.picture}
+                onChange={(e) => setImageURL(e.target.value)}
                 required
                 placeholder="https://imageshack.com/zoot.png"
                 className="input input-bordered w-full max-w-xs"
+              />
+              <input
+                type="file"
+                onChange={(e) => {
+                  console.log(e.target.files);
+                  const data = new FormData() as any;
+                  data.file = e.target.files?.[0];
+                  axios
+                    .post("http://localhost:8000/uploads", data)
+                    .then((res) => setImageURL(res.data.url));
+                }}
               />
             </div>
           </div>

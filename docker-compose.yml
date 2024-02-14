@@ -19,6 +19,13 @@ services:
     volumes:
       - ./backend/src:/app/src
 
+  upload-service:
+    build: file-upload-service
+    ports:
+      - 8000:8000
+    volumes:
+      - ./file-upload-service/files:/app/files
+
   frontend:
     build: frontend
     ports:
