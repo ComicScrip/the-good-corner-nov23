@@ -5,7 +5,9 @@
   "main": "index.ts",
   "scripts": {
     "start": "ts-node-dev ./src/index.ts",
-    "resetDB": "ts-node-dev src/resetDb.ts"
+    "resetDB": "ts-node-dev src/resetDb.ts",
+    "build": "tsc",
+    "start:prod": "node build/index.js"
   },
   "keywords": [
     "ads"
