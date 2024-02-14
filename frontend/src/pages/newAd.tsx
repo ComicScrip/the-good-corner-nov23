@@ -1,10 +1,8 @@
 import Layout from "@/components/Layout";
-import { Category, Tag } from "@/types";
+import { Tag } from "@/types";
 import { FormEvent, useEffect, useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/router";
 import Select from "react-select";
-import { gql, useMutation } from "@apollo/client";
 import {
   useAllTagsQuery,
   useCreateAdMutation,
@@ -40,8 +38,6 @@ export default function NewAd() {
   };
 
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-
-  console.log({ categories });
 
   return (
     <Layout pageTitle="Creation d'une annonce">

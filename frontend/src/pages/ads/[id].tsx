@@ -1,18 +1,19 @@
 import Layout from "@/components/Layout";
-import { AdDetails as AdDetailsType } from "@/types";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import axios from "axios";
 import { UserCircleIcon } from "@heroicons/react/24/outline";
 import { MapPinIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
-import { gql, useQuery } from "@apollo/client";
-import { useAdDetailsQuery } from "@/graphql/generated/schema";
+import {
+  useAdDetailsQuery,
+  useDeleteAdMutation,
+} from "@/graphql/generated/schema";
 
 export default function AdDetails() {
   const router = useRouter();
   const { id } = router.query;
+
+  const [deleteAd] = useDeleteAdMutation();
 
   const { data } = useAdDetailsQuery({
     variables: { adId: parseInt(id as string) },
@@ -75,14 +76,11 @@ export default function AdDetails() {
                   onClick={() => {
                     if (
                       confirm(
-                        "Etes-vous certain.e de vouloir supprimer cette annonce ?"
+                        "Êtes-vous certain.e de vouloir supprimer cette annonce ?"
                       )
                     )
-                      axios
-                        .delete(`http://localhost:4000/ads/${ad.id}`)
-                        .then(() => {
-                          router.push("/");
-                        })
+                      deleteAd({ variables: { adId: ad.id } })
+                        .then(() => router.push("/"))
                         .catch(console.error);
                   }}
                 >

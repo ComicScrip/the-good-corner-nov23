@@ -1,0 +1,3 @@
+mutation DeleteAd($adId: Float!) {
+  deleteAd(adId: $adId)
+}

@@ -1,13 +1,9 @@
 import AdminTagRow from "@/components/admin/AdminTagRow";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Tag } from "@/types";
-import axios from "axios";
-import { useEffect, useState } from "react";
 import {
   useAllTagsQuery,
   useCreateTagMutation,
   useDeleteTagMutation,
-  useUpdateTagMutation,
 } from "@/graphql/generated/schema";
 
 export default function AdminTags() {

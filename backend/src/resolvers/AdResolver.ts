@@ -1,7 +1,7 @@
 import { Resolver, Query, Arg, Mutation, Int } from "type-graphql";
 import Ad, { NewAdInput, UpdateAdInput } from "../entities/Ad";
 import { GraphQLError } from "graphql";
-import { In, Like } from "typeorm";
+import { ILike, In } from "typeorm";
 
 @Resolver(Ad)
 class AdsResolver {
@@ -20,7 +20,7 @@ class AdsResolver {
               ? In(tagIds.split(",").map((t) => parseInt(t, 10)))
               : undefined,
         },
-        title: title ? Like(`%${title}%`) : undefined,
+        title: title ? ILike(`%${title}%`) : undefined,
         category: {
           id: categoryId,
         },

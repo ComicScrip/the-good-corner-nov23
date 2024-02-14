@@ -5,7 +5,6 @@ import { TrashIcon } from "@heroicons/react/24/outline";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/outline";
-import axios from "axios";
 import { useUpdateCategoryMutation } from "@/graphql/generated/schema";
 
 interface AdminCategoryRowProps {
