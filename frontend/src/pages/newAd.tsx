@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import { Tag } from "@/types";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/router";
 import Select from "react-select";
 import {
@@ -8,8 +8,11 @@ import {
   useCreateAdMutation,
   useCategoriesQuery,
 } from "@/graphql/generated/schema";
+import axios from "axios";
+import uploadFile from "@/helpers/uploadFile";
 
 export default function NewAd() {
+  const [imageURL, setImageURL] = useState("");
   const [createAd] = useCreateAdMutation();
 
   const { data: tagsData } = useAllTagsQuery();
@@ -114,9 +117,19 @@ export default function NewAd() {
               name="picture"
               id="picture"
               required
+              value={imageURL}
+              onChange={(e) => setImageURL(e.target.value)}
               placeholder="https://imageshack.com/zoot.png"
               className="input input-bordered w-full max-w-xs"
             />
+            <input
+              type="file"
+              onChange={(e) => {
+                if (e.target.files?.[0])
+                  uploadFile(e.target.files?.[0]).then(setImageURL);
+              }}
+            />
+            {imageURL && <img src={imageURL} alt="picture" />}
           </div>
         </div>
 
