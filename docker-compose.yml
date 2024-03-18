@@ -1,15 +1,20 @@
 services:
   db:
+    stop_grace_period: 0s
     image: postgres:15-alpine
     environment:
       POSTGRES_PASSWORD: postgres
+      PGUSER: postgres
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
       timeout: 5s
       retries: 5
+    ports:
+      - 5432:5432
 
   backend:
+    stop_grace_period: 0s
     depends_on:
       db:
         condition: service_healthy
@@ -20,6 +25,7 @@ services:
       - ./backend/src:/app/src
 
   upload-service:
+    stop_grace_period: 0s
     build: file-upload-service
     ports:
       - 8000:8000
@@ -27,6 +33,7 @@ services:
       - ./file-upload-service/files:/app/files
 
   frontend:
+    stop_grace_period: 0s
     build: frontend
     ports:
       - 3000:3000
