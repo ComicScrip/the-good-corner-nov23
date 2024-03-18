@@ -11,12 +11,15 @@ export default function NewAd() {
     const formData = new FormData(e.target as HTMLFormElement);
     const formJSON: any = Object.fromEntries(formData.entries());
 
+    setError("");
     try {
       const res = await createUser({ variables: { data: formJSON } });
       console.log({ res });
       alert("Vous etes bien enregistré.e. Merci !");
-    } catch (e) {
-      setError("une erreur est survenue");
+    } catch (e: any) {
+      if (e.message === "EMAIL_ALREADY_TAKEN")
+        setError("Cet e-mail est déjà pris");
+      else setError("une erreur est survenue");
     }
   };
 
