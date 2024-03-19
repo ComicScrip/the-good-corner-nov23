@@ -61,4 +61,15 @@ export class NewUserInput {
   password: string;
 }
 
+@InputType()
+export class LoginInput {
+  @IsEmail()
+  @Field()
+  email: string;
+
+  @Field()
+  @IsStrongPassword()
+  password: string;
+}
+
 export default User;

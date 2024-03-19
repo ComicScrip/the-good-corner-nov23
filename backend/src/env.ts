@@ -7,4 +7,5 @@ export default load({
   DB_PASS: String,
   DB_NAME: String,
   SERVER_PORT: Number,
+  JWT_PRIVATE_KEY: String,
 });
