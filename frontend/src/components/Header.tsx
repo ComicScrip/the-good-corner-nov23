@@ -7,7 +7,10 @@ import { useCategoriesQuery } from "@/graphql/generated/schema";
 export default function Header() {
   const router = useRouter();
 
-  const { data } = useCategoriesQuery();
+  const { data, error } = useCategoriesQuery();
+
+  console.log({ data, error });
+
   const categories = data?.categories || [];
 
   const [search, setSearch] = useState("");

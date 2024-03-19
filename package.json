@@ -1,0 +1,11 @@
+{
+  "name": "the-good-corner-nov23",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:prod": "docker compose -f docker-compose.production.yml up --build"
+  },
+  "author": "",
+  "license": "ISC"
+}

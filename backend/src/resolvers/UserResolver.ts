@@ -51,6 +51,12 @@ class UserResolver {
   async profile(@Ctx() ctx: Context) {
     return ctx.currentUser;
   }
+
+  @Mutation(() => Boolean)
+  async logout(@Ctx() ctx: Context) {
+    ctx.res.clearCookie("token");
+    return true;
+  }
 }
 
 export default UserResolver;
