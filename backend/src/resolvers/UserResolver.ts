@@ -1,9 +1,10 @@
-import { Arg, Mutation, Resolver } from "type-graphql";
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import User, { LoginInput, NewUserInput } from "../entities/User";
 import { GraphQLError } from "graphql";
 import { verify } from "argon2";
 import jwt from "jsonwebtoken";
 import env from "../env";
+import { Context } from "../types";
 
 @Resolver()
 class UserResolver {
@@ -19,7 +20,7 @@ class UserResolver {
   }
 
   @Mutation(() => String)
-  async login(@Arg("data") data: LoginInput) {
+  async login(@Arg("data") data: LoginInput, @Ctx() ctx: Context) {
     const existingUser = await User.findOneBy({ email: data.email });
     if (existingUser === null) throw new GraphQLError("Invalid Credentials");
     const passwordVerified = await verify(
@@ -36,7 +37,19 @@ class UserResolver {
       { expiresIn: "30d" }
     );
 
+    ctx.res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      secure: env.NODE_ENV === "production",
+    });
+
     return token;
+  }
+
+  @Authorized()
+  @Query(() => User)
+  async profile(@Ctx() ctx: Context) {
+    return ctx.currentUser;
   }
 }
 
