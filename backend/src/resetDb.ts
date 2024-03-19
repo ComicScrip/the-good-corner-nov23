@@ -2,6 +2,7 @@ import db from "./db";
 import Ad from "./entities/Ad";
 import Category from "./entities/Category";
 import Tag from "./entities/Tag";
+import User from "./entities/User";
 
 export async function clearDB() {
   const runner = db.createQueryRunner();
@@ -23,6 +24,22 @@ export async function clearDB() {
 async function main() {
   await db.initialize();
   await clearDB();
+
+  const admin = new User();
+  Object.assign(admin, {
+    nickname: "admin",
+    email: "admin@app.com",
+    password: "4dminAdmin@!",
+  });
+  await admin.save();
+
+  const user = new User();
+  Object.assign(user, {
+    nickname: "visitor",
+    email: "visitor@app.com",
+    password: "Visitor42@!",
+  });
+  await user.save();
 
   const macbook = Ad.create({
     title: "Macbook pro",
