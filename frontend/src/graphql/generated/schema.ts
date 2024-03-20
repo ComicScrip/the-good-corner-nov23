@@ -212,6 +212,7 @@ export type UpdateUserInput = {
 
 export type User = {
   __typename?: 'User';
+  ads: Array<Ad>;
   avatar: Scalars['String'];
   email: Scalars['String'];
   id: Scalars['Float'];
@@ -280,7 +281,7 @@ export type AllTagsQuery = { __typename?: 'Query', tags: Array<{ __typename?: 'T
 export type ProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ProfileQuery = { __typename?: 'Query', profile: { __typename?: 'User', id: number, email: string, avatar: string, nickname: string } };
+export type ProfileQuery = { __typename?: 'Query', profile: { __typename?: 'User', id: number, email: string, avatar: string, nickname: string, ads: Array<{ __typename?: 'Ad', id: number, title: string, picture: string, price: number }> } };
 
 export type LoginMutationVariables = Exact<{
   data: LoginInput;
@@ -669,6 +670,12 @@ export const ProfileDocument = gql`
     email
     avatar
     nickname
+    ads {
+      id
+      title
+      picture
+      price
+    }
   }
 }
     `;

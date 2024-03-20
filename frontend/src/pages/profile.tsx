@@ -1,3 +1,4 @@
+import AdCard from "@/components/AdCard";
 import Layout from "@/components/Layout";
 import {
   useProfileQuery,
@@ -11,7 +12,7 @@ export default function Profile() {
 
   const [updateProfile] = useUpdateProfileMutation();
 
-  const { data: currentUser, client } = useProfileQuery({
+  const { data: currentUser } = useProfileQuery({
     errorPolicy: "ignore",
   });
 
@@ -75,6 +76,16 @@ export default function Profile() {
           Mise à jour
         </button>
       </form>
+
+      <div>
+        <h2 className="text-xl mb-4">Mes annonces</h2>
+
+        <section className="flex flex-wrap pb-24">
+          {currentUser.profile.ads.map((ad) => (
+            <AdCard key={ad.id} ad={ad} link={`/ads/${ad.id}`} />
+          ))}
+        </section>
+      </div>
     </Layout>
   );
 }

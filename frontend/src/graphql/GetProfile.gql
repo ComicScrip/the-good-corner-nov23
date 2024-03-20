@@ -4,5 +4,11 @@ query Profile {
     email
     avatar
     nickname
+    ads {
+      id
+      title
+      picture
+      price
+    }
   }
 }
