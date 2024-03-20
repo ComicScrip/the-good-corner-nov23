@@ -5,6 +5,7 @@ import { verify } from "argon2";
 import jwt from "jsonwebtoken";
 import env from "../env";
 import { Context } from "../types";
+import mailer from "../mailer";
 
 @Resolver()
 class UserResolver {
@@ -50,6 +51,18 @@ class UserResolver {
   @Query(() => User)
   async profile(@Ctx() ctx: Context) {
     return ctx.currentUser;
+  }
+
+  @Mutation(() => String)
+  async sendResetPasswordEmail(@Arg("to") to: string) {
+    const res = await mailer.sendMail({
+      text: "hola",
+      to,
+      from: "pierre.genthon@wildcodeschool.com",
+    });
+    console.log({ res });
+
+    return "ok";
   }
 }
 
