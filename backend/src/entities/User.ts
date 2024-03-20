@@ -5,9 +5,11 @@ import {
   BeforeInsert,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { hash } from "argon2";
+import Ad from "./Ad";
 
 @Entity()
 @ObjectType()
@@ -33,6 +35,10 @@ class User extends BaseEntity {
 
   @Column()
   hashedPassword: string;
+
+  @Field(() => [Ad])
+  @OneToMany(() => Ad, (a) => a.owner)
+  ads: Ad[];
 
   @Column({
     default:

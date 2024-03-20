@@ -37,7 +37,7 @@ export default class Ad extends BaseEntity {
   */
 
   @Field()
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (u) => u.ads)
   owner: User;
 
   @Column({ type: "float" })
