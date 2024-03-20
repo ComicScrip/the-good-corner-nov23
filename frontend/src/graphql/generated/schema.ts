@@ -50,9 +50,10 @@ export type Mutation = {
   deleteCategory: Scalars['String'];
   deleteTag: Scalars['String'];
   login: Scalars['String'];
-  logout: Scalars['Boolean'];
+  logout: Scalars['String'];
   updateAd: Ad;
   updateCategory: Category;
+  updateProfile: User;
   updateTag: Tag;
 };
 
@@ -106,6 +107,11 @@ export type MutationUpdateAdArgs = {
 export type MutationUpdateCategoryArgs = {
   categoryId: Scalars['Float'];
   data: UpdateCategoryInput;
+};
+
+
+export type MutationUpdateProfileArgs = {
+  data: UpdateUserInput;
 };
 
 
@@ -201,6 +207,11 @@ export type UpdateTagInput = {
   name?: InputMaybe<Scalars['String']>;
 };
 
+export type UpdateUserInput = {
+  avatar?: InputMaybe<Scalars['String']>;
+  nickname?: InputMaybe<Scalars['String']>;
+};
+
 export type User = {
   __typename?: 'User';
   avatar: Scalars['String'];
@@ -283,7 +294,7 @@ export type LoginMutation = { __typename?: 'Mutation', login: string };
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+export type LogoutMutation = { __typename?: 'Mutation', logout: string };
 
 export type RecentAdsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -320,6 +331,13 @@ export type UpdateCategoryMutationVariables = Exact<{
 
 
 export type UpdateCategoryMutation = { __typename?: 'Mutation', updateCategory: { __typename?: 'Category', id: number, name: string } };
+
+export type UpdateProfileMutationVariables = Exact<{
+  data: UpdateUserInput;
+}>;
+
+
+export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile: { __typename?: 'User', id: number, email: string, nickname: string, avatar: string } };
 
 export type UpdateTagMutationVariables = Exact<{
   data: UpdateTagInput;
@@ -921,6 +939,42 @@ export function useUpdateCategoryMutation(baseOptions?: Apollo.MutationHookOptio
 export type UpdateCategoryMutationHookResult = ReturnType<typeof useUpdateCategoryMutation>;
 export type UpdateCategoryMutationResult = Apollo.MutationResult<UpdateCategoryMutation>;
 export type UpdateCategoryMutationOptions = Apollo.BaseMutationOptions<UpdateCategoryMutation, UpdateCategoryMutationVariables>;
+export const UpdateProfileDocument = gql`
+    mutation UpdateProfile($data: UpdateUserInput!) {
+  updateProfile(data: $data) {
+    id
+    email
+    nickname
+    avatar
+  }
+}
+    `;
+export type UpdateProfileMutationFn = Apollo.MutationFunction<UpdateProfileMutation, UpdateProfileMutationVariables>;
+
+/**
+ * __useUpdateProfileMutation__
+ *
+ * To run a mutation, you first call `useUpdateProfileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateProfileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateProfileMutation, { data, loading, error }] = useUpdateProfileMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateProfileMutation(baseOptions?: Apollo.MutationHookOptions<UpdateProfileMutation, UpdateProfileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateProfileMutation, UpdateProfileMutationVariables>(UpdateProfileDocument, options);
+      }
+export type UpdateProfileMutationHookResult = ReturnType<typeof useUpdateProfileMutation>;
+export type UpdateProfileMutationResult = Apollo.MutationResult<UpdateProfileMutation>;
+export type UpdateProfileMutationOptions = Apollo.BaseMutationOptions<UpdateProfileMutation, UpdateProfileMutationVariables>;
 export const UpdateTagDocument = gql`
     mutation UpdateTag($data: UpdateTagInput!, $tagId: Float!) {
   updateTag(data: $data, tagId: $tagId) {
