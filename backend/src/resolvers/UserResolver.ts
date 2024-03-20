@@ -53,7 +53,11 @@ class UserResolver {
   @Authorized()
   @Query(() => User)
   async profile(@Ctx() ctx: Context) {
-    return ctx.currentUser;
+    if (!ctx.currentUser) throw new GraphQLError("you need to be logged in!");
+    return User.findOneOrFail({
+      where: { id: ctx.currentUser.id },
+      relations: { ads: true },
+    });
   }
 
   @Mutation(() => String)

@@ -22,7 +22,7 @@ export type Ad = {
   description: Scalars['String'];
   id: Scalars['Int'];
   location: Scalars['String'];
-  owner: Scalars['String'];
+  owner: User;
   picture: Scalars['String'];
   price: Scalars['Float'];
   tags: Array<Tag>;
@@ -124,7 +124,6 @@ export type NewAdInput = {
   category: ObjectId;
   description: Scalars['String'];
   location: Scalars['String'];
-  owner: Scalars['String'];
   picture: Scalars['String'];
   price: Scalars['Float'];
   tags?: InputMaybe<Array<ObjectId>>;
@@ -192,7 +191,6 @@ export type UpdateAdInput = {
   city?: InputMaybe<Scalars['String']>;
   description?: InputMaybe<Scalars['String']>;
   location?: InputMaybe<Scalars['String']>;
-  owner?: InputMaybe<Scalars['String']>;
   picture?: InputMaybe<Scalars['String']>;
   price?: InputMaybe<Scalars['Float']>;
   tags?: InputMaybe<Array<ObjectId>>;
@@ -214,6 +212,7 @@ export type UpdateUserInput = {
 
 export type User = {
   __typename?: 'User';
+  ads: Array<Ad>;
   avatar: Scalars['String'];
   email: Scalars['String'];
   id: Scalars['Float'];
@@ -225,7 +224,7 @@ export type AdDetailsQueryVariables = Exact<{
 }>;
 
 
-export type AdDetailsQuery = { __typename?: 'Query', getAdById: { __typename?: 'Ad', id: number, title: string, description: string, owner: string, price: number, location: string, picture: string, category: { __typename?: 'Category', id: number, name: string }, tags: Array<{ __typename?: 'Tag', id: number, name: string }> } };
+export type AdDetailsQuery = { __typename?: 'Query', getAdById: { __typename?: 'Ad', id: number, title: string, description: string, price: number, location: string, picture: string, owner: { __typename?: 'User', id: number, nickname: string, avatar: string }, category: { __typename?: 'Category', id: number, name: string }, tags: Array<{ __typename?: 'Tag', id: number, name: string }> } };
 
 export type CategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -282,7 +281,7 @@ export type AllTagsQuery = { __typename?: 'Query', tags: Array<{ __typename?: 'T
 export type ProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ProfileQuery = { __typename?: 'Query', profile: { __typename?: 'User', id: number, email: string, avatar: string, nickname: string } };
+export type ProfileQuery = { __typename?: 'Query', profile: { __typename?: 'User', id: number, email: string, avatar: string, nickname: string, ads: Array<{ __typename?: 'Ad', id: number, title: string, picture: string, price: number }> } };
 
 export type LoginMutationVariables = Exact<{
   data: LoginInput;
@@ -354,7 +353,11 @@ export const AdDetailsDocument = gql`
     id
     title
     description
-    owner
+    owner {
+      id
+      nickname
+      avatar
+    }
     price
     location
     picture
@@ -667,6 +670,12 @@ export const ProfileDocument = gql`
     email
     avatar
     nickname
+    ads {
+      id
+      title
+      picture
+      price
+    }
   }
 }
     `;

@@ -1,7 +1,16 @@
-import { Resolver, Query, Arg, Mutation, Int } from "type-graphql";
+import {
+  Resolver,
+  Query,
+  Arg,
+  Mutation,
+  Int,
+  Ctx,
+  Authorized,
+} from "type-graphql";
 import Ad, { NewAdInput, UpdateAdInput } from "../entities/Ad";
 import { GraphQLError } from "graphql";
 import { ILike, In } from "typeorm";
+import { Context } from "../types";
 
 @Resolver(Ad)
 class AdsResolver {
@@ -32,20 +41,30 @@ class AdsResolver {
   async getAdById(@Arg("adId", () => Int) id: number) {
     const ad = await Ad.findOne({
       where: { id },
-      relations: { category: true, tags: true },
+      relations: { category: true, tags: true, owner: true },
     });
     if (!ad) throw new GraphQLError("not found");
     return ad;
   }
 
+  @Authorized()
   @Mutation(() => Ad)
-  async createAd(@Arg("data", { validate: true }) data: NewAdInput) {
+  async createAd(
+    @Arg("data", { validate: true }) data: NewAdInput,
+    @Ctx() ctx: Context
+  ) {
+    if (!ctx.currentUser) return new GraphQLError("you need to be logged in");
     const newAd = new Ad();
+
     Object.assign(newAd, data);
+
+    newAd.owner = ctx.currentUser;
+
     const { id } = await newAd.save();
+
     return Ad.findOne({
       where: { id },
-      relations: { category: true, tags: true },
+      relations: { category: true, tags: true, owner: true },
     });
   }
 

@@ -53,8 +53,12 @@ export default function AdDetails() {
               <p className="mt-6 mb-6">{ad.description}</p>
               <div className="flex justify-between mb-6">
                 <div className="flex items-center mt-3">
-                  <UserCircleIcon width={24} height={24} className="mr-2" />{" "}
-                  {ad.owner}
+                  <img
+                    src={ad.owner.avatar}
+                    alt={ad.owner.nickname}
+                    className="h-8 w-8 rounded-full mr-2"
+                  />
+                  {ad.owner.nickname}
                 </div>
 
                 <div className="flex items-center mt-2 ">
