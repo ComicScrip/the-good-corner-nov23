@@ -41,7 +41,7 @@ class AdsResolver {
   async getAdById(@Arg("adId", () => Int) id: number) {
     const ad = await Ad.findOne({
       where: { id },
-      relations: { category: true, tags: true },
+      relations: { category: true, tags: true, owner: true },
     });
     if (!ad) throw new GraphQLError("not found");
     return ad;
