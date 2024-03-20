@@ -62,6 +62,17 @@ export class NewUserInput {
 }
 
 @InputType()
+export class UpdateUserInput {
+  @Length(2, 30)
+  @Field({ nullable: true })
+  nickname?: string;
+
+  @Length(2, 255)
+  @Field({ nullable: true })
+  avatar?: string;
+}
+
+@InputType()
 export class LoginInput {
   @IsEmail()
   @Field()
