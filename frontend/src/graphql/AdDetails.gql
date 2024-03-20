@@ -3,7 +3,11 @@ query AdDetails($adId: Int!) {
     id
     title
     description
-    owner
+    owner {
+      id
+      nickname
+      avatar
+    }
     price
     location
     picture
