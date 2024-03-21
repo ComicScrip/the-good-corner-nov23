@@ -5,9 +5,16 @@ import {
   BeforeInsert,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { hash } from "argon2";
+import Ad from "./Ad";
+
+export enum UserRole {
+  Admin = "admin",
+  Visitor = "visitor",
+}
 
 @Entity()
 @ObjectType()
@@ -34,12 +41,20 @@ class User extends BaseEntity {
   @Column()
   hashedPassword: string;
 
+  @Field(() => [Ad])
+  @OneToMany(() => Ad, (a) => a.owner)
+  ads: Ad[];
+
   @Column({
     default:
       "https://icons.veryicon.com/png/o/miscellaneous/standard/avatar-15.png",
   })
   @Field()
   avatar: string;
+
+  @Field()
+  @Column({ enum: UserRole, default: UserRole.Visitor })
+  role: UserRole;
 }
 
 @InputType()
@@ -59,6 +74,17 @@ export class NewUserInput {
   @Field()
   @IsStrongPassword()
   password: string;
+}
+
+@InputType()
+export class UpdateUserInput {
+  @Length(2, 30)
+  @Field({ nullable: true })
+  nickname?: string;
+
+  @Length(2, 255)
+  @Field({ nullable: true })
+  avatar?: string;
 }
 
 @InputType()

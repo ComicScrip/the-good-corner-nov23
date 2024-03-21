@@ -1,7 +1,17 @@
-import { Resolver, Query, Arg, Mutation, Int } from "type-graphql";
+import {
+  Resolver,
+  Query,
+  Arg,
+  Mutation,
+  Int,
+  Ctx,
+  Authorized,
+} from "type-graphql";
 import Ad, { NewAdInput, UpdateAdInput } from "../entities/Ad";
 import { GraphQLError } from "graphql";
 import { ILike, In } from "typeorm";
+import { Context } from "../types";
+import { UserRole } from "../entities/User";
 
 @Resolver(Ad)
 class AdsResolver {
@@ -32,30 +42,53 @@ class AdsResolver {
   async getAdById(@Arg("adId", () => Int) id: number) {
     const ad = await Ad.findOne({
       where: { id },
-      relations: { category: true, tags: true },
+      relations: { category: true, tags: true, owner: true },
     });
     if (!ad) throw new GraphQLError("not found");
     return ad;
   }
 
+  @Authorized()
   @Mutation(() => Ad)
-  async createAd(@Arg("data", { validate: true }) data: NewAdInput) {
+  async createAd(
+    @Arg("data", { validate: true }) data: NewAdInput,
+    @Ctx() ctx: Context
+  ) {
+    if (!ctx.currentUser) return new GraphQLError("you need to be logged in");
     const newAd = new Ad();
+
     Object.assign(newAd, data);
+
+    newAd.owner = ctx.currentUser;
+
     const { id } = await newAd.save();
+
     return Ad.findOne({
       where: { id },
-      relations: { category: true, tags: true },
+      relations: { category: true, tags: true, owner: true },
     });
   }
 
+  @Authorized()
   @Mutation(() => Ad)
   async updateAd(
+    @Ctx() ctx: Context,
     @Arg("adId") id: number,
     @Arg("data", { validate: true }) data: UpdateAdInput
   ) {
-    const adToUpdate = await Ad.findOneBy({ id });
+    if (!ctx.currentUser) throw new GraphQLError("you need to be logged in!");
+
+    const adToUpdate = await Ad.findOne({
+      where: { id },
+      relations: { owner: true },
+    });
     if (!adToUpdate) throw new GraphQLError("not found");
+
+    if (
+      ctx.currentUser.role !== UserRole.Admin &&
+      adToUpdate?.owner.id !== ctx.currentUser.id
+    )
+      throw new GraphQLError("you are not the owner of this ad !");
 
     await Object.assign(adToUpdate, data);
 
@@ -66,9 +99,19 @@ class AdsResolver {
     });
   }
 
+  @Authorized()
   @Mutation(() => String)
-  async deleteAd(@Arg("adId") id: number) {
-    const ad = await Ad.findOne({ where: { id } });
+  async deleteAd(@Arg("adId") id: number, @Ctx() ctx: Context) {
+    if (!ctx.currentUser) throw new GraphQLError("you need to be logged in!");
+
+    const ad = await Ad.findOne({ where: { id }, relations: { owner: true } });
+
+    if (
+      ctx.currentUser.role !== UserRole.Admin &&
+      ad?.owner.id !== ctx.currentUser.id
+    )
+      throw new GraphQLError("you are not the owner of this ad !");
+
     if (!ad) throw new GraphQLError("not found");
     await ad.remove();
     return "deleted";

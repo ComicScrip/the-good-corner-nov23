@@ -22,7 +22,7 @@ export type Ad = {
   description: Scalars['String'];
   id: Scalars['Int'];
   location: Scalars['String'];
-  owner: Scalars['String'];
+  owner: User;
   picture: Scalars['String'];
   price: Scalars['Float'];
   tags: Array<Tag>;
@@ -50,9 +50,10 @@ export type Mutation = {
   deleteCategory: Scalars['String'];
   deleteTag: Scalars['String'];
   login: Scalars['String'];
-  logout: Scalars['Boolean'];
+  logout: Scalars['String'];
   updateAd: Ad;
   updateCategory: Category;
+  updateProfile: User;
   updateTag: Tag;
 };
 
@@ -109,6 +110,11 @@ export type MutationUpdateCategoryArgs = {
 };
 
 
+export type MutationUpdateProfileArgs = {
+  data: UpdateUserInput;
+};
+
+
 export type MutationUpdateTagArgs = {
   data: UpdateTagInput;
   tagId: Scalars['Float'];
@@ -118,7 +124,6 @@ export type NewAdInput = {
   category: ObjectId;
   description: Scalars['String'];
   location: Scalars['String'];
-  owner: Scalars['String'];
   picture: Scalars['String'];
   price: Scalars['Float'];
   tags?: InputMaybe<Array<ObjectId>>;
@@ -186,7 +191,6 @@ export type UpdateAdInput = {
   city?: InputMaybe<Scalars['String']>;
   description?: InputMaybe<Scalars['String']>;
   location?: InputMaybe<Scalars['String']>;
-  owner?: InputMaybe<Scalars['String']>;
   picture?: InputMaybe<Scalars['String']>;
   price?: InputMaybe<Scalars['Float']>;
   tags?: InputMaybe<Array<ObjectId>>;
@@ -201,12 +205,19 @@ export type UpdateTagInput = {
   name?: InputMaybe<Scalars['String']>;
 };
 
+export type UpdateUserInput = {
+  avatar?: InputMaybe<Scalars['String']>;
+  nickname?: InputMaybe<Scalars['String']>;
+};
+
 export type User = {
   __typename?: 'User';
+  ads: Array<Ad>;
   avatar: Scalars['String'];
   email: Scalars['String'];
   id: Scalars['Float'];
   nickname: Scalars['String'];
+  role: Scalars['String'];
 };
 
 export type AdDetailsQueryVariables = Exact<{
@@ -214,7 +225,7 @@ export type AdDetailsQueryVariables = Exact<{
 }>;
 
 
-export type AdDetailsQuery = { __typename?: 'Query', getAdById: { __typename?: 'Ad', id: number, title: string, description: string, owner: string, price: number, location: string, picture: string, category: { __typename?: 'Category', id: number, name: string }, tags: Array<{ __typename?: 'Tag', id: number, name: string }> } };
+export type AdDetailsQuery = { __typename?: 'Query', getAdById: { __typename?: 'Ad', id: number, title: string, description: string, price: number, location: string, picture: string, owner: { __typename?: 'User', id: number, nickname: string, avatar: string }, category: { __typename?: 'Category', id: number, name: string }, tags: Array<{ __typename?: 'Tag', id: number, name: string }> } };
 
 export type CategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -271,7 +282,7 @@ export type AllTagsQuery = { __typename?: 'Query', tags: Array<{ __typename?: 'T
 export type ProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ProfileQuery = { __typename?: 'Query', profile: { __typename?: 'User', id: number, email: string, avatar: string, nickname: string } };
+export type ProfileQuery = { __typename?: 'Query', profile: { __typename?: 'User', id: number, email: string, avatar: string, nickname: string, role: string, ads: Array<{ __typename?: 'Ad', id: number, title: string, picture: string, price: number }> } };
 
 export type LoginMutationVariables = Exact<{
   data: LoginInput;
@@ -283,7 +294,7 @@ export type LoginMutation = { __typename?: 'Mutation', login: string };
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+export type LogoutMutation = { __typename?: 'Mutation', logout: string };
 
 export type RecentAdsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -321,6 +332,13 @@ export type UpdateCategoryMutationVariables = Exact<{
 
 export type UpdateCategoryMutation = { __typename?: 'Mutation', updateCategory: { __typename?: 'Category', id: number, name: string } };
 
+export type UpdateProfileMutationVariables = Exact<{
+  data: UpdateUserInput;
+}>;
+
+
+export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile: { __typename?: 'User', id: number, email: string, nickname: string, avatar: string } };
+
 export type UpdateTagMutationVariables = Exact<{
   data: UpdateTagInput;
   tagId: Scalars['Float'];
@@ -336,7 +354,11 @@ export const AdDetailsDocument = gql`
     id
     title
     description
-    owner
+    owner {
+      id
+      nickname
+      avatar
+    }
     price
     location
     picture
@@ -649,6 +671,13 @@ export const ProfileDocument = gql`
     email
     avatar
     nickname
+    role
+    ads {
+      id
+      title
+      picture
+      price
+    }
   }
 }
     `;
@@ -921,6 +950,42 @@ export function useUpdateCategoryMutation(baseOptions?: Apollo.MutationHookOptio
 export type UpdateCategoryMutationHookResult = ReturnType<typeof useUpdateCategoryMutation>;
 export type UpdateCategoryMutationResult = Apollo.MutationResult<UpdateCategoryMutation>;
 export type UpdateCategoryMutationOptions = Apollo.BaseMutationOptions<UpdateCategoryMutation, UpdateCategoryMutationVariables>;
+export const UpdateProfileDocument = gql`
+    mutation UpdateProfile($data: UpdateUserInput!) {
+  updateProfile(data: $data) {
+    id
+    email
+    nickname
+    avatar
+  }
+}
+    `;
+export type UpdateProfileMutationFn = Apollo.MutationFunction<UpdateProfileMutation, UpdateProfileMutationVariables>;
+
+/**
+ * __useUpdateProfileMutation__
+ *
+ * To run a mutation, you first call `useUpdateProfileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateProfileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateProfileMutation, { data, loading, error }] = useUpdateProfileMutation({
+ *   variables: {
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateProfileMutation(baseOptions?: Apollo.MutationHookOptions<UpdateProfileMutation, UpdateProfileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateProfileMutation, UpdateProfileMutationVariables>(UpdateProfileDocument, options);
+      }
+export type UpdateProfileMutationHookResult = ReturnType<typeof useUpdateProfileMutation>;
+export type UpdateProfileMutationResult = Apollo.MutationResult<UpdateProfileMutation>;
+export type UpdateProfileMutationOptions = Apollo.BaseMutationOptions<UpdateProfileMutation, UpdateProfileMutationVariables>;
 export const UpdateTagDocument = gql`
     mutation UpdateTag($data: UpdateTagInput!, $tagId: Float!) {
   updateTag(data: $data, tagId: $tagId) {

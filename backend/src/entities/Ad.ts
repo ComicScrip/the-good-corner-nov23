@@ -13,6 +13,7 @@ import { ObjectType, Field, Int, InputType } from "type-graphql";
 import Category from "./Category";
 import Tag from "./Tag";
 import { ObjectId } from "../types";
+import User from "./User";
 
 @Entity()
 @ObjectType()
@@ -29,9 +30,15 @@ export default class Ad extends BaseEntity {
   @Field()
   description: string;
 
-  @Column()
+  /*
   @Field()
+  @Column()
   owner: string;
+  */
+
+  @Field()
+  @ManyToOne(() => User, (u) => u.ads)
+  owner: User;
 
   @Column({ type: "float" })
   @Field()
@@ -74,9 +81,6 @@ export class NewAdInput {
   description: string;
 
   @Field()
-  owner: string;
-
-  @Field()
   @Min(0, { message: "le prix doit etre positif" })
   price: number;
 
@@ -100,9 +104,6 @@ export class UpdateAdInput {
 
   @Field({ nullable: true })
   description?: string;
-
-  @Field({ nullable: true })
-  owner?: string;
 
   @Field({ nullable: true })
   @Min(0, { message: "le prix doit etre positif" })
