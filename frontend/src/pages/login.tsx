@@ -28,7 +28,7 @@ export default function Login() {
     errorPolicy: "ignore",
   });
 
-  console.log({currentUser})
+  console.log({ currentUser });
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     setError("");
@@ -40,10 +40,13 @@ export default function Login() {
     if (errors.length > 0) return setError(errors.join("\n"));
 
     try {
-      const res = await login({ variables: { data: formJSON } });
-      console.log({ res });
+      await login({ variables: { data: formJSON } });
     } catch (e: any) {
-      setError("Identifiants incorrects");
+      if (e.message === "EMAIL_NOT_VERIFIED")
+        setError(
+          "Merci de confirmer votre email avant de pouvoir vous connecter"
+        );
+      else setError("Identifiants incorrects");
     } finally {
       client.resetStore();
     }

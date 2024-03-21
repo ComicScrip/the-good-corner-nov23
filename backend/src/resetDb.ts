@@ -31,6 +31,7 @@ async function main() {
     email: "admin@app.com",
     password: "4dminAdmin@!",
     role: UserRole.Admin,
+    emailVerified: true,
   });
   await admin.save();
 
@@ -39,6 +40,7 @@ async function main() {
     nickname: "visitor",
     email: "visitor@app.com",
     password: "Visitor42@!",
+    emailVerified: true,
   });
   await user.save();
 
