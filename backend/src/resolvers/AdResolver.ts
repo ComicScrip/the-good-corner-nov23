@@ -11,6 +11,7 @@ import Ad, { NewAdInput, UpdateAdInput } from "../entities/Ad";
 import { GraphQLError } from "graphql";
 import { ILike, In } from "typeorm";
 import { Context } from "../types";
+import { UserRole } from "../entities/User";
 
 @Resolver(Ad)
 class AdsResolver {
@@ -68,13 +69,26 @@ class AdsResolver {
     });
   }
 
+  @Authorized()
   @Mutation(() => Ad)
   async updateAd(
+    @Ctx() ctx: Context,
     @Arg("adId") id: number,
     @Arg("data", { validate: true }) data: UpdateAdInput
   ) {
-    const adToUpdate = await Ad.findOneBy({ id });
+    if (!ctx.currentUser) throw new GraphQLError("you need to be logged in!");
+
+    const adToUpdate = await Ad.findOne({
+      where: { id },
+      relations: { owner: true },
+    });
     if (!adToUpdate) throw new GraphQLError("not found");
+
+    if (
+      ctx.currentUser.role !== UserRole.Admin &&
+      adToUpdate?.owner.id !== ctx.currentUser.id
+    )
+      throw new GraphQLError("you are not the owner of this ad !");
 
     await Object.assign(adToUpdate, data);
 
@@ -85,9 +99,19 @@ class AdsResolver {
     });
   }
 
+  @Authorized()
   @Mutation(() => String)
-  async deleteAd(@Arg("adId") id: number) {
-    const ad = await Ad.findOne({ where: { id } });
+  async deleteAd(@Arg("adId") id: number, @Ctx() ctx: Context) {
+    if (!ctx.currentUser) throw new GraphQLError("you need to be logged in!");
+
+    const ad = await Ad.findOne({ where: { id }, relations: { owner: true } });
+
+    if (
+      ctx.currentUser.role !== UserRole.Admin &&
+      ad?.owner.id !== ctx.currentUser.id
+    )
+      throw new GraphQLError("you are not the owner of this ad !");
+
     if (!ad) throw new GraphQLError("not found");
     await ad.remove();
     return "deleted";
