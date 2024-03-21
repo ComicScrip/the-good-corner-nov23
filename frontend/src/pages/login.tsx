@@ -28,8 +28,6 @@ export default function Login() {
     errorPolicy: "ignore",
   });
 
-  console.log({ currentUser });
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     setError("");
     e.preventDefault();
