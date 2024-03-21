@@ -25,13 +25,11 @@ class UserResolver {
     newUser.emailConfirmationToken = emailConfirmationToken;
     const newUserWithId = await newUser.save();
 
-    const res = await mailer.sendMail({
-      text: `Merci de cliquer sur ce lien pour confirmer votre adresse : ${env.FRONTEND_URL}/emailConfirmation?token=${emailConfirmationToken}}`,
+    await mailer.sendMail({
+      text: `Bonjour ${newUserWithId.nickname}, merci de bien cliquer sur ce lien pour confirmer votre adresse : ${env.FRONTEND_URL}/emailConfirmation?token=${emailConfirmationToken}`,
       to: newUserWithId.email,
       from: env.EMAIL_FROM,
     });
-
-    console.log({ res });
 
     return newUserWithId;
   }
@@ -45,6 +43,8 @@ class UserResolver {
       return new GraphQLError("invalid or expired token");
 
     userWithConfimrationToken.emailConfirmationToken = null;
+    userWithConfimrationToken.emailVerified = true;
+
     await userWithConfimrationToken.save();
 
     return "ok";
