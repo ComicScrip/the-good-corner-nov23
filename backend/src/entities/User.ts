@@ -55,6 +55,12 @@ class User extends BaseEntity {
   @Field()
   @Column({ enum: UserRole, default: UserRole.Visitor })
   role: UserRole;
+
+  @Column({ nullable: true, unique: true, type: "varchar" })
+  emailConfirmationToken?: string | null;
+
+  @Column({ default: false })
+  emailVerified: boolean;
 }
 
 @InputType()

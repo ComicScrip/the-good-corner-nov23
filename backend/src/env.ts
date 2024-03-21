@@ -14,4 +14,6 @@ export default load({
   SMTP_PORT: Number,
   SMTP_USER: String,
   SMTP_PASSWORD: String,
+  EMAIL_FROM: String,
+  FRONTEND_URL: String,
 });

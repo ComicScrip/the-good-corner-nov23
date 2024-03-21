@@ -1,4 +1,5 @@
 import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import crypto from "crypto";
 import User, {
   LoginInput,
   NewUserInput,
@@ -20,8 +21,33 @@ class UserResolver {
 
     const newUser = new User();
     Object.assign(newUser, data);
+    const emailConfirmationToken = crypto.randomBytes(20).toString("hex");
+    newUser.emailConfirmationToken = emailConfirmationToken;
     const newUserWithId = await newUser.save();
+
+    const res = await mailer.sendMail({
+      text: `Merci de cliquer sur ce lien pour confirmer votre adresse : ${env.FRONTEND_URL}/emailConfirmation?token=${emailConfirmationToken}}`,
+      to: newUserWithId.email,
+      from: env.EMAIL_FROM,
+    });
+
+    console.log({ res });
+
     return newUserWithId;
+  }
+
+  @Mutation(() => String)
+  async confirmEmail(@Arg("confirmationToken") confirmationToken: string) {
+    const userWithConfimrationToken = await User.findOneBy({
+      emailConfirmationToken: confirmationToken,
+    });
+    if (userWithConfimrationToken === null)
+      return new GraphQLError("invalid or expired token");
+
+    userWithConfimrationToken.emailConfirmationToken = null;
+    await userWithConfimrationToken.save();
+
+    return "ok";
   }
 
   @Mutation(() => String)
@@ -80,18 +106,6 @@ class UserResolver {
     if (data.nickname) ctx.currentUser.nickname = data.nickname;
 
     return ctx.currentUser.save();
-  }
-
-  @Mutation(() => String)
-  async sendResetPasswordEmail(@Arg("to") to: string) {
-    const res = await mailer.sendMail({
-      text: "hola",
-      to,
-      from: "pierre.genthon@wildcodeschool.com",
-    });
-    console.log({ res });
-
-    return "ok";
   }
 }
 
