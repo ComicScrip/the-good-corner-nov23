@@ -11,6 +11,11 @@ import {
 import { hash } from "argon2";
 import Ad from "./Ad";
 
+export enum UserRole {
+  Admin = "admin",
+  Visitor = "visitor",
+}
+
 @Entity()
 @ObjectType()
 class User extends BaseEntity {
@@ -46,6 +51,10 @@ class User extends BaseEntity {
   })
   @Field()
   avatar: string;
+
+  @Field()
+  @Column({ enum: UserRole, default: UserRole.Visitor })
+  role: UserRole;
 }
 
 @InputType()

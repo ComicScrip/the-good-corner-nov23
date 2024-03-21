@@ -2,7 +2,7 @@ import db from "./db";
 import Ad from "./entities/Ad";
 import Category from "./entities/Category";
 import Tag from "./entities/Tag";
-import User from "./entities/User";
+import User, { UserRole } from "./entities/User";
 
 export async function clearDB() {
   const runner = db.createQueryRunner();
@@ -30,6 +30,7 @@ async function main() {
     nickname: "admin",
     email: "admin@app.com",
     password: "4dminAdmin@!",
+    role: UserRole.Admin,
   });
   await admin.save();
 

@@ -4,6 +4,7 @@ query Profile {
     email
     avatar
     nickname
+    role
     ads {
       id
       title

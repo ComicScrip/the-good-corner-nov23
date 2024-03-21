@@ -1,13 +1,15 @@
-import { Resolver, Mutation, Arg, Query } from "type-graphql";
+import { Resolver, Mutation, Arg, Query, Authorized } from "type-graphql";
 import { GraphQLError } from "graphql";
 import { Like } from "typeorm";
 import Category, {
   NewCategoryInput,
   UpdateCategoryInput,
 } from "../entities/Category";
+import { UserRole } from "../entities/User";
 
 @Resolver(Category)
 class CategoriesResolver {
+  @Authorized([UserRole.Admin])
   @Mutation(() => Category)
   async createCategory(
     @Arg("data", { validate: true }) data: NewCategoryInput
@@ -24,6 +26,8 @@ class CategoriesResolver {
       order: { id: "desc" },
     });
   }
+
+  @Authorized([UserRole.Admin])
   @Mutation(() => String)
   async deleteCategory(@Arg("categoryId") id: number) {
     const categoryToDelete = await Category.findOneBy({ id });
@@ -31,6 +35,8 @@ class CategoriesResolver {
     await categoryToDelete.remove();
     return "ok";
   }
+
+  @Authorized([UserRole.Admin])
   @Mutation(() => Category)
   async updateCategory(
     @Arg("categoryId") id: number,
