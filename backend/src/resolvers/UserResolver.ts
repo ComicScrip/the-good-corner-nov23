@@ -9,6 +9,8 @@ import { verify } from "argon2";
 import jwt from "jsonwebtoken";
 import env from "../env";
 import { Context } from "../types";
+import mailer from "../mailer";
+import crypto from "crypto";
 
 @Resolver()
 class UserResolver {
@@ -19,8 +21,34 @@ class UserResolver {
 
     const newUser = new User();
     Object.assign(newUser, data);
+
+    const token = crypto.randomBytes(20).toString("hex");
+
+    newUser.emailConfirmationToken = token;
+
+    await mailer.sendMail({
+      subject: "Bienvenue sur TGC !",
+      to: newUser.email,
+      from: env.EMAIL_FROM,
+      text: `Bienvenue parmi nous ${newUser.nickname}. Merci de bien vouloir cliquer sur ce lien pour confirmer votre email : ${env.FRONTEND_URL}/emailConfirmation?token=${token}`,
+    });
+
     const newUserWithId = await newUser.save();
     return newUserWithId;
+  }
+
+  @Mutation(() => String)
+  async confirmEmail(@Arg("token") token: string) {
+    const user = await User.findOneBy({ emailConfirmationToken: token });
+
+    if (user === null)
+      throw new GraphQLError("the token is invalid ou expired");
+
+    user.emailVerified = true;
+    user.emailConfirmationToken = null;
+
+    user.save();
+    return "ok";
   }
 
   @Mutation(() => String)
@@ -32,6 +60,9 @@ class UserResolver {
       data.password
     );
     if (!passwordVerified) throw new GraphQLError("Invalid Credentials");
+
+    if (!existingUser.emailVerified)
+      throw new GraphQLError("EMAIL_NOT_VERIFIED");
 
     const token = jwt.sign(
       {

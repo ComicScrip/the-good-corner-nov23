@@ -37,7 +37,9 @@ export default function Signup() {
     try {
       const res = await createUser({ variables: { data: formJSON } });
       console.log({ res });
-      alert("Vous etes bien enregistré.e. Merci !");
+      alert(
+        "Vous etes bien enregistré.e. Merci de bien vouloir vérifier votre boite mail pour confirmer votre adresse."
+      );
     } catch (e: any) {
       if (e.message === "EMAIL_ALREADY_TAKEN")
         setError("Cet e-mail est déjà pris");
