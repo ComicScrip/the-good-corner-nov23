@@ -8,12 +8,85 @@ import { GraphQLError } from "graphql";
 import { verify } from "argon2";
 import jwt from "jsonwebtoken";
 import env from "../env";
-import { Context } from "../types";
+import {
+  Context,
+  PublicKeyCredentialCreationOptionsJSON,
+  VerifiedRegistrationResponse,
+} from "../types";
 import mailer from "../mailer";
 import crypto from "crypto";
+import Credential, { CredentialInput } from "../entities/Credential";
+import {
+  generateRegistrationOptions,
+  verifyRegistrationResponse,
+} from "@simplewebauthn/server";
+
+// Human-readable title for your website
+const rpName = "The Good Corner";
+// A unique identifier for your website
+const rpID = "localhost";
 
 @Resolver()
 class UserResolver {
+  @Query(() => String)
+  async challenge() {
+    return crypto.randomUUID();
+  }
+
+  @Mutation(() => PublicKeyCredentialCreationOptionsJSON)
+  async signupPasswordlessOptions(
+    @Arg("username") username: string,
+    @Arg("displayname") displayname: string
+  ) {
+    const options = await generateRegistrationOptions({
+      rpName,
+      rpID,
+      userID: username,
+      userName: displayname,
+      // Don't prompt users for additional information about the authenticator
+      // (Recommended for smoother UX)
+      attestationType: "none",
+      // Prevent users from re-registering existing authenticators
+      excludeCredentials: [],
+      authenticatorSelection: {
+        residentKey: "discouraged",
+        userVerification: "preferred",
+      },
+    });
+
+    console.log("options sent by server", JSON.stringify({ options }, null, 2));
+
+    return options;
+  }
+
+  @Mutation(() => Boolean)
+  async registerWebAuthnCredential(
+    @Arg("credential") cred: CredentialInput,
+    @Arg("challenge") challenge: string
+  ) {
+    console.log("hey", JSON.stringify({ cred }, null, 2));
+
+    try {
+      const verification = await verifyRegistrationResponse({
+        response: {
+          id: cred.id,
+          rawId: cred.rawId,
+          type: "public-key",
+          clientExtensionResults: cred.clientExtensionResults,
+          response: { ...cred.response, transports: cred.response.transports },
+          authenticatorAttachment: cred.authenticatorAttachment,
+        },
+        expectedChallenge: challenge,
+        expectedOrigin: `http://${rpID}:3000`,
+        expectedRPID: rpID,
+        requireUserVerification: false,
+      });
+      return verification.verified;
+    } catch (err: any) {
+      console.error({ err });
+    }
+  }
+
   @Mutation(() => User)
   async createUser(@Arg("data", { validate: true }) data: NewUserInput) {
     const existingUser = await User.findOneBy({ email: data.email });
@@ -54,7 +127,8 @@ class UserResolver {
   @Mutation(() => String)
   async login(@Arg("data") data: LoginInput, @Ctx() ctx: Context) {
     const existingUser = await User.findOneBy({ email: data.email });
-    if (existingUser === null) throw new GraphQLError("Invalid Credentials");
+    if (existingUser === null || !existingUser.hashedPassword)
+      throw new GraphQLError("Invalid Credentials");
     const passwordVerified = await verify(
       existingUser.hashedPassword,
       data.password

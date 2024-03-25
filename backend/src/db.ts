@@ -4,6 +4,7 @@ import Category from "./entities/Category";
 import Tag from "./entities/Tag";
 import env from "./env";
 import User from "./entities/User";
+import Credential from "./entities/Credential";
 
 export default new DataSource({
   type: "postgres",
@@ -12,6 +13,6 @@ export default new DataSource({
   username: env.DB_USER,
   password: env.DB_PASS,
   database: env.DB_NAME,
-  entities: [Ad, Category, Tag, User],
+  entities: [Ad, Category, Tag, User, Credential],
   synchronize: true,
 });

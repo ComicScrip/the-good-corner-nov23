@@ -10,6 +10,12 @@ import {
 } from "typeorm";
 import { hash } from "argon2";
 import Ad from "./Ad";
+import Credential from "./Credential";
+
+import type {
+  AuthenticatorTransportFuture,
+  CredentialDeviceType,
+} from "@simplewebauthn/types";
 
 export enum UserRole {
   Admin = "admin",
@@ -19,11 +25,11 @@ export enum UserRole {
 @Entity()
 @ObjectType()
 class User extends BaseEntity {
-  password: string;
+  password?: string;
 
   @BeforeInsert()
   async hashPassword() {
-    this.hashedPassword = await hash(this.password);
+    if (this.password) this.hashedPassword = await hash(this.password);
   }
 
   @Field()
@@ -35,11 +41,11 @@ class User extends BaseEntity {
   email: string;
 
   @Field()
-  @Column()
+  @Column({ unique: true })
   nickname: string;
 
-  @Column()
-  hashedPassword: string;
+  @Column({ nullable: true })
+  hashedPassword?: string;
 
   @Field(() => [Ad])
   @OneToMany(() => Ad, (a) => a.owner)
@@ -61,6 +67,9 @@ class User extends BaseEntity {
 
   @Column({ default: false })
   emailVerified: boolean;
+
+  @OneToMany(() => Credential, (c) => c.user)
+  credentials: Credential[];
 }
 
 @InputType()
