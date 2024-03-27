@@ -68,7 +68,7 @@ class User extends BaseEntity {
   @Column({ default: false })
   emailVerified: boolean;
 
-  @OneToMany(() => Credential, (c) => c.user)
+  @OneToMany(() => Credential, (c) => c.user, { cascade: true })
   credentials: Credential[];
 }
 

@@ -22,83 +22,22 @@ export default function SignupPasswordless() {
           e.preventDefault();
           setError("");
           try {
-            const options = await registerWebAuthnOptions({
-              variables: { displayname: nickname, username: email },
+            const [displayname, username] = [nickname, email];
+            const optionsRes = await registerWebAuthnOptions({
+              variables: { displayname, username },
             });
-            if (!options.data) throw new Error("could not get signup options");
+            if (!optionsRes.data)
+              throw new Error("could not get signup options");
 
-            const {
-              rp,
-              challenge,
-              pubKeyCredParams,
-              user,
-              attestation,
-              authenticatorSelection,
-              timeout,
-              excludeCredentials,
-              extensions,
-            } = options.data.registerWebAuthnCredentialOptions;
+            const { challenge, pubKeyCredParams, extensions } =
+              optionsRes.data.registerWebAuthnCredentialOptions;
 
             const registrationOpts = {
-              rp: { name: rp.name, id: rp.id || undefined },
-              challenge,
+              ...optionsRes.data.registerWebAuthnCredentialOptions,
               pubKeyCredParams: pubKeyCredParams.map((p) => ({
                 alg: p.alg,
                 type: "public-key",
               })),
-              user: {
-                displayName: user.displayName,
-                id: user.id,
-                name: user.name,
-              },
-              attestation:
-                (attestation as
-                  | "direct"
-                  | "enterprise"
-                  | "indirect"
-                  | "none") ?? undefined,
-              authenticatorSelection: {
-                authenticatorAttachment:
-                  (authenticatorSelection.authenticatorAttachment as
-                    | "cross-platform"
-                    | "platform") ?? undefined,
-                requireResidentKey:
-                  authenticatorSelection.requireResidentKey ?? undefined,
-                residentKey:
-                  (authenticatorSelection.residentKey as
-                    | "discouraged"
-                    | "preferred"
-                    | "required") ?? undefined,
-                userVerification:
-                  (authenticatorSelection.userVerification as
-                    | "discouraged"
-                    | "preferred"
-                    | "required") ?? undefined,
-              },
-              timeout: timeout ?? undefined,
-              excludeCredentials: excludeCredentials
-                ? (
-                    excludeCredentials ??
-                    ([] as {
-                      type: string;
-                      id: string;
-                      transports: string[];
-                    }[])
-                  ).map((c) => ({
-                    id: c.id,
-                    type: "public-key",
-                    transports: c.transports as (
-                      | "ble"
-                      | "cable"
-                      | "hybrid"
-                      | "internal"
-                      | "nfc"
-                      | "smart-card"
-                      | "usb"
-                    )[],
-                  }))
-                : undefined,
-
               extensions: {
                 appid: extensions?.appid ?? undefined,
                 credProps: extensions?.credProps ?? undefined,
@@ -106,46 +45,14 @@ export default function SignupPasswordless() {
               },
             };
 
-            console.log({ registrationOpts });
+            const credential = await startRegistration(registrationOpts as any);
 
-            const res = await startRegistration(registrationOpts as any);
-
-            console.log({ res });
-
-            const confirmation = await registerWebAuthn({
-              variables: {
-                challenge,
-                credential: res,
-                username: email,
-                displayname: nickname,
-              },
+            await registerWebAuthn({
+              variables: { challenge, credential, username, displayname },
             });
-
-            console.log({ confirmation });
-
-            /*
-            const registration = await client.register(email, challenge, {
-              authenticatorType: "auto",
-              userVerification: "required",
-              timeout: 60000,
-              attestation: true,
-              debug: false,
-            });
-            console.log({ registration });
-            await signup({
-              variables: {
-                registration: {
-                  authenticatorData: registration.authenticatorData,
-                  clientData: registration.clientData,
-                  credential: registration.credential,
-                  username: email,
-                },
-              },
-            });
-            */
           } catch (err: any) {
-            console.log({ err });
-
+            if (err.message === "EMAIL_ALREADY_TAKEN")
+              setError("Cet e-mail est déjà pris");
             setError("error occured");
           }
         }}
