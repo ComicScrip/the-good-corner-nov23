@@ -34,7 +34,33 @@ class UserResolver {
   }
 
   @Mutation(() => PublicKeyCredentialCreationOptionsJSON)
-  async signupPasswordlessOptions(
+  async registerWebAuthnCredentialOptions(
+    @Arg("username") username: string,
+    @Arg("displayname") displayname: string
+  ) {
+    const options = await generateRegistrationOptions({
+      rpName,
+      rpID,
+      userID: username,
+      userName: displayname,
+      // Don't prompt users for additional information about the authenticator
+      // (Recommended for smoother UX)
+      attestationType: "none",
+      // Prevent users from re-registering existing authenticators
+      excludeCredentials: [],
+      authenticatorSelection: {
+        residentKey: "discouraged",
+        userVerification: "preferred",
+      },
+    });
+
+    console.log("options sent by server", JSON.stringify({ options }, null, 2));
+
+    return options;
+  }
+
+  @Mutation(() => PublicKeyCredentialCreationOptionsJSON)
+  async authWebAuthnCredentialOptions(
     @Arg("username") username: string,
     @Arg("displayname") displayname: string
   ) {
@@ -62,26 +88,56 @@ class UserResolver {
   @Mutation(() => Boolean)
   async registerWebAuthnCredential(
     @Arg("credential") cred: CredentialInput,
-    @Arg("challenge") challenge: string
+    @Arg("challenge") challenge: string,
+    @Arg("username") email: string,
+    @Arg("displayname") nickname: string
   ) {
-    console.log("hey", JSON.stringify({ cred }, null, 2));
+    const {
+      clientExtensionResults,
+      response,
+      authenticatorAttachment,
+      id,
+      rawId,
+    } = cred;
 
     try {
-      const verification = await verifyRegistrationResponse({
+      const { verified, registrationInfo } = await verifyRegistrationResponse({
         response: {
-          id: cred.id,
-          rawId: cred.rawId,
+          id,
+          rawId,
           type: "public-key",
-          clientExtensionResults: cred.clientExtensionResults,
-          response: { ...cred.response, transports: cred.response.transports },
-          authenticatorAttachment: cred.authenticatorAttachment,
+          clientExtensionResults,
+          response,
+          authenticatorAttachment,
         },
         expectedChallenge: challenge,
-        expectedOrigin: `http://${rpID}:3000`,
+        expectedOrigin: env.FRONTEND_URL,
         expectedRPID: rpID,
         requireUserVerification: false,
       });
-      return verification.verified;
+
+      if (verified && registrationInfo) {
+        // const existingUserWithEmail = await User.findOne({ where: { email } });
+
+        const newUser = new User();
+        Object.assign(newUser, {
+          email,
+          nickname,
+        });
+        const { credentialPublicKey, credentialID, counter } = registrationInfo;
+
+        const c = new Credential();
+        Object.assign(c, {
+          credentialPublicKey,
+          credentialID: credentialID.toString(),
+          counter,
+        });
+
+        newUser.credentials = [c];
+        await newUser.save();
+      }
+
+      return verified;
     } catch (err: any) {
       console.error({ err });
     }

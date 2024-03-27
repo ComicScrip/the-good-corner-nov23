@@ -85,6 +85,7 @@ export type LoginInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  authWebAuthnCredentialOptions: PublicKeyCredentialCreationOptionsJson;
   confirmEmail: Scalars['String'];
   createAd: Ad;
   createCategory: Category;
@@ -96,11 +97,17 @@ export type Mutation = {
   login: Scalars['String'];
   logout: Scalars['String'];
   registerWebAuthnCredential: Scalars['Boolean'];
-  signupPasswordlessOptions: PublicKeyCredentialCreationOptionsJson;
+  registerWebAuthnCredentialOptions: PublicKeyCredentialCreationOptionsJson;
   updateAd: Ad;
   updateCategory: Category;
   updateProfile: User;
   updateTag: Tag;
+};
+
+
+export type MutationAuthWebAuthnCredentialOptionsArgs = {
+  displayname: Scalars['String'];
+  username: Scalars['String'];
 };
 
 
@@ -152,10 +159,12 @@ export type MutationLoginArgs = {
 export type MutationRegisterWebAuthnCredentialArgs = {
   challenge: Scalars['String'];
   credential: CredentialInput;
+  displayname: Scalars['String'];
+  username: Scalars['String'];
 };
 
 
-export type MutationSignupPasswordlessOptionsArgs = {
+export type MutationRegisterWebAuthnCredentialOptionsArgs = {
   displayname: Scalars['String'];
   username: Scalars['String'];
 };
@@ -419,10 +428,20 @@ export type RecentAdsQuery = { __typename?: 'Query', ads: Array<{ __typename?: '
 export type RegisterWebAuthnCredentialMutationVariables = Exact<{
   challenge: Scalars['String'];
   credential: CredentialInput;
+  username: Scalars['String'];
+  displayname: Scalars['String'];
 }>;
 
 
 export type RegisterWebAuthnCredentialMutation = { __typename?: 'Mutation', registerWebAuthnCredential: boolean };
+
+export type RegisterWebAuthnCredentialOptionsMutationVariables = Exact<{
+  displayname: Scalars['String'];
+  username: Scalars['String'];
+}>;
+
+
+export type RegisterWebAuthnCredentialOptionsMutation = { __typename?: 'Mutation', registerWebAuthnCredentialOptions: { __typename?: 'PublicKeyCredentialCreationOptionsJSON', challenge: string, timeout?: number | null, attestation?: string | null, rp: { __typename?: 'PublicKeyCredentialRpEntity', id?: string | null, name: string }, user: { __typename?: 'PublicKeyCredentialUserEntityJSON', displayName: string, id: string, name: string }, pubKeyCredParams: Array<{ __typename?: 'PublicKeyCredentialParameters', alg: number, type: string }>, excludeCredentials?: Array<{ __typename?: 'PublicKeyCredentialDescriptorJSON', type: string, id: string, transports: Array<string> }> | null, authenticatorSelection: { __typename?: 'AuthenticatorSelectionCriteria', authenticatorAttachment?: string | null, requireResidentKey?: boolean | null, residentKey?: string | null, userVerification?: string | null }, extensions?: { __typename?: 'AuthenticationExtensionsClientInputs', appid?: string | null, credProps?: boolean | null, hmacCreateSecret?: boolean | null } | null } };
 
 export type SearchAdsQueryVariables = Exact<{
   title?: InputMaybe<Scalars['String']>;
@@ -438,14 +457,6 @@ export type SignupMutationVariables = Exact<{
 
 
 export type SignupMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: number, nickname: string, email: string, avatar: string } };
-
-export type SignupPasswordlessOptionsMutationVariables = Exact<{
-  displayname: Scalars['String'];
-  username: Scalars['String'];
-}>;
-
-
-export type SignupPasswordlessOptionsMutation = { __typename?: 'Mutation', signupPasswordlessOptions: { __typename?: 'PublicKeyCredentialCreationOptionsJSON', challenge: string, timeout?: number | null, attestation?: string | null, rp: { __typename?: 'PublicKeyCredentialRpEntity', id?: string | null, name: string }, user: { __typename?: 'PublicKeyCredentialUserEntityJSON', displayName: string, id: string, name: string }, pubKeyCredParams: Array<{ __typename?: 'PublicKeyCredentialParameters', alg: number, type: string }>, excludeCredentials?: Array<{ __typename?: 'PublicKeyCredentialDescriptorJSON', type: string, id: string, transports: Array<string> }> | null, authenticatorSelection: { __typename?: 'AuthenticatorSelectionCriteria', authenticatorAttachment?: string | null, requireResidentKey?: boolean | null, residentKey?: string | null, userVerification?: string | null }, extensions?: { __typename?: 'AuthenticationExtensionsClientInputs', appid?: string | null, credProps?: boolean | null, hmacCreateSecret?: boolean | null } | null } };
 
 export type UpdateAdMutationVariables = Exact<{
   data: UpdateAdInput;
@@ -1001,8 +1012,13 @@ export type RecentAdsQueryHookResult = ReturnType<typeof useRecentAdsQuery>;
 export type RecentAdsLazyQueryHookResult = ReturnType<typeof useRecentAdsLazyQuery>;
 export type RecentAdsQueryResult = Apollo.QueryResult<RecentAdsQuery, RecentAdsQueryVariables>;
 export const RegisterWebAuthnCredentialDocument = gql`
-    mutation RegisterWebAuthnCredential($challenge: String!, $credential: CredentialInput!) {
-  registerWebAuthnCredential(challenge: $challenge, credential: $credential)
+    mutation RegisterWebAuthnCredential($challenge: String!, $credential: CredentialInput!, $username: String!, $displayname: String!) {
+  registerWebAuthnCredential(
+    challenge: $challenge
+    credential: $credential
+    username: $username
+    displayname: $displayname
+  )
 }
     `;
 export type RegisterWebAuthnCredentialMutationFn = Apollo.MutationFunction<RegisterWebAuthnCredentialMutation, RegisterWebAuthnCredentialMutationVariables>;
@@ -1022,6 +1038,8 @@ export type RegisterWebAuthnCredentialMutationFn = Apollo.MutationFunction<Regis
  *   variables: {
  *      challenge: // value for 'challenge'
  *      credential: // value for 'credential'
+ *      username: // value for 'username'
+ *      displayname: // value for 'displayname'
  *   },
  * });
  */
@@ -1032,6 +1050,74 @@ export function useRegisterWebAuthnCredentialMutation(baseOptions?: Apollo.Mutat
 export type RegisterWebAuthnCredentialMutationHookResult = ReturnType<typeof useRegisterWebAuthnCredentialMutation>;
 export type RegisterWebAuthnCredentialMutationResult = Apollo.MutationResult<RegisterWebAuthnCredentialMutation>;
 export type RegisterWebAuthnCredentialMutationOptions = Apollo.BaseMutationOptions<RegisterWebAuthnCredentialMutation, RegisterWebAuthnCredentialMutationVariables>;
+export const RegisterWebAuthnCredentialOptionsDocument = gql`
+    mutation RegisterWebAuthnCredentialOptions($displayname: String!, $username: String!) {
+  registerWebAuthnCredentialOptions(
+    displayname: $displayname
+    username: $username
+  ) {
+    rp {
+      id
+      name
+    }
+    user {
+      displayName
+      id
+      name
+    }
+    challenge
+    pubKeyCredParams {
+      alg
+      type
+    }
+    timeout
+    excludeCredentials {
+      type
+      id
+      transports
+    }
+    authenticatorSelection {
+      authenticatorAttachment
+      requireResidentKey
+      residentKey
+      userVerification
+    }
+    attestation
+    extensions {
+      appid
+      credProps
+      hmacCreateSecret
+    }
+  }
+}
+    `;
+export type RegisterWebAuthnCredentialOptionsMutationFn = Apollo.MutationFunction<RegisterWebAuthnCredentialOptionsMutation, RegisterWebAuthnCredentialOptionsMutationVariables>;
+
+/**
+ * __useRegisterWebAuthnCredentialOptionsMutation__
+ *
+ * To run a mutation, you first call `useRegisterWebAuthnCredentialOptionsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRegisterWebAuthnCredentialOptionsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [registerWebAuthnCredentialOptionsMutation, { data, loading, error }] = useRegisterWebAuthnCredentialOptionsMutation({
+ *   variables: {
+ *      displayname: // value for 'displayname'
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useRegisterWebAuthnCredentialOptionsMutation(baseOptions?: Apollo.MutationHookOptions<RegisterWebAuthnCredentialOptionsMutation, RegisterWebAuthnCredentialOptionsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RegisterWebAuthnCredentialOptionsMutation, RegisterWebAuthnCredentialOptionsMutationVariables>(RegisterWebAuthnCredentialOptionsDocument, options);
+      }
+export type RegisterWebAuthnCredentialOptionsMutationHookResult = ReturnType<typeof useRegisterWebAuthnCredentialOptionsMutation>;
+export type RegisterWebAuthnCredentialOptionsMutationResult = Apollo.MutationResult<RegisterWebAuthnCredentialOptionsMutation>;
+export type RegisterWebAuthnCredentialOptionsMutationOptions = Apollo.BaseMutationOptions<RegisterWebAuthnCredentialOptionsMutation, RegisterWebAuthnCredentialOptionsMutationVariables>;
 export const SearchAdsDocument = gql`
     query SearchAds($title: String, $categoryId: Int) {
   ads(title: $title, categoryId: $categoryId) {
@@ -1107,71 +1193,6 @@ export function useSignupMutation(baseOptions?: Apollo.MutationHookOptions<Signu
 export type SignupMutationHookResult = ReturnType<typeof useSignupMutation>;
 export type SignupMutationResult = Apollo.MutationResult<SignupMutation>;
 export type SignupMutationOptions = Apollo.BaseMutationOptions<SignupMutation, SignupMutationVariables>;
-export const SignupPasswordlessOptionsDocument = gql`
-    mutation SignupPasswordlessOptions($displayname: String!, $username: String!) {
-  signupPasswordlessOptions(displayname: $displayname, username: $username) {
-    rp {
-      id
-      name
-    }
-    user {
-      displayName
-      id
-      name
-    }
-    challenge
-    pubKeyCredParams {
-      alg
-      type
-    }
-    timeout
-    excludeCredentials {
-      type
-      id
-      transports
-    }
-    authenticatorSelection {
-      authenticatorAttachment
-      requireResidentKey
-      residentKey
-      userVerification
-    }
-    attestation
-    extensions {
-      appid
-      credProps
-      hmacCreateSecret
-    }
-  }
-}
-    `;
-export type SignupPasswordlessOptionsMutationFn = Apollo.MutationFunction<SignupPasswordlessOptionsMutation, SignupPasswordlessOptionsMutationVariables>;
-
-/**
- * __useSignupPasswordlessOptionsMutation__
- *
- * To run a mutation, you first call `useSignupPasswordlessOptionsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSignupPasswordlessOptionsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [signupPasswordlessOptionsMutation, { data, loading, error }] = useSignupPasswordlessOptionsMutation({
- *   variables: {
- *      displayname: // value for 'displayname'
- *      username: // value for 'username'
- *   },
- * });
- */
-export function useSignupPasswordlessOptionsMutation(baseOptions?: Apollo.MutationHookOptions<SignupPasswordlessOptionsMutation, SignupPasswordlessOptionsMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SignupPasswordlessOptionsMutation, SignupPasswordlessOptionsMutationVariables>(SignupPasswordlessOptionsDocument, options);
-      }
-export type SignupPasswordlessOptionsMutationHookResult = ReturnType<typeof useSignupPasswordlessOptionsMutation>;
-export type SignupPasswordlessOptionsMutationResult = Apollo.MutationResult<SignupPasswordlessOptionsMutation>;
-export type SignupPasswordlessOptionsMutationOptions = Apollo.BaseMutationOptions<SignupPasswordlessOptionsMutation, SignupPasswordlessOptionsMutationVariables>;
 export const UpdateAdDocument = gql`
     mutation UpdateAd($data: UpdateAdInput!, $adId: Float!) {
   updateAd(data: $data, adId: $adId) {

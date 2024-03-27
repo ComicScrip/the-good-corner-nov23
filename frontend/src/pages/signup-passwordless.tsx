@@ -1,14 +1,15 @@
 import Layout from "@/components/Layout";
 import {
   useRegisterWebAuthnCredentialMutation,
-  useSignupPasswordlessOptionsMutation,
+  useRegisterWebAuthnCredentialOptionsMutation,
 } from "@/graphql/generated/schema";
 import { useState } from "react";
 import { startRegistration } from "@simplewebauthn/browser";
 
 export default function SignupPasswordless() {
   const [registerWebAuthn] = useRegisterWebAuthnCredentialMutation();
-  const [signupOptions] = useSignupPasswordlessOptionsMutation();
+  const [registerWebAuthnOptions] =
+    useRegisterWebAuthnCredentialOptionsMutation();
   const [error, setError] = useState("");
 
   const [email, setEmail] = useState("");
@@ -21,7 +22,7 @@ export default function SignupPasswordless() {
           e.preventDefault();
           setError("");
           try {
-            const options = await signupOptions({
+            const options = await registerWebAuthnOptions({
               variables: { displayname: nickname, username: email },
             });
             if (!options.data) throw new Error("could not get signup options");
@@ -36,7 +37,7 @@ export default function SignupPasswordless() {
               timeout,
               excludeCredentials,
               extensions,
-            } = options.data.signupPasswordlessOptions;
+            } = options.data.registerWebAuthnCredentialOptions;
 
             const registrationOpts = {
               rp: { name: rp.name, id: rp.id || undefined },
@@ -115,6 +116,8 @@ export default function SignupPasswordless() {
               variables: {
                 challenge,
                 credential: res,
+                username: email,
+                displayname: nickname,
               },
             });
 

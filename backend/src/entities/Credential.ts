@@ -8,14 +8,14 @@ import User from "./User";
 export default class Credential extends BaseEntity {
   @Field()
   @PrimaryColumn()
-  id: string;
+  credentialID: string;
 
   @Field()
   @Column()
-  publicKey: string;
+  credentialPublicKey: string;
 
-  @Column({ type: "varchar" })
-  algorithm: "ES256" | "RS256";
+  @Column({ type: "int" })
+  counter: number;
 
   @ManyToOne(() => User, (u) => u.credentials)
   user: User;
