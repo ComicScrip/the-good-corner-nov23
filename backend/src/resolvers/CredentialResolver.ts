@@ -6,14 +6,18 @@ import jwt from "jsonwebtoken";
 import env from "../env";
 import { Context } from "../types";
 import Credential, {
+  CredentialAuthInput,
   CredentialInput,
   PublicKeyCredentialCreationOptionsJSON,
+  PublicKeyCredentialRequestOptionsJSON,
 } from "../entities/Credential";
 import {
   generateAuthenticationOptions,
   generateRegistrationOptions,
+  verifyAuthenticationResponse,
   verifyRegistrationResponse,
 } from "@simplewebauthn/server";
+import { isoBase64URL, isoUint8Array } from "@simplewebauthn/server/helpers";
 
 // Human-readable title for your website
 const rpName = "The Good Corner";
@@ -42,18 +46,6 @@ class CredentialResolver {
     return options;
   }
 
-  @Mutation(() => PublicKeyCredentialCreationOptionsJSON)
-  async authWebAuthnCredentialOptions(
-    @Arg("username") username: string,
-    @Arg("displayname") displayname: string,
-    @Ctx() ctx: Context
-  ) {
-    const options = await generateAuthenticationOptions({
-      rpID: ctx.req.hostname,
-    });
-    return options;
-  }
-
   @Mutation(() => Boolean)
   async registerWebAuthnCredential(
     @Arg("credential") cred: CredentialInput,
@@ -64,7 +56,7 @@ class CredentialResolver {
   ) {
     try {
       const { verified, registrationInfo } = await verifyRegistrationResponse({
-        response: cred,
+        response: { ...cred, type: "public-key" },
         expectedChallenge: challenge,
         expectedOrigin: env.FRONTEND_URL,
         expectedRPID: ctx.req.hostname,
@@ -77,7 +69,13 @@ class CredentialResolver {
           throw new GraphQLError("EMAIL_ALREADY_EXISTS");
 
         const { credentialPublicKey, credentialID, counter } = registrationInfo;
-        const credentialProps = { credentialPublicKey, credentialID, counter };
+        const { transports = [] } = cred.response;
+        const credentialProps = {
+          credentialPublicKey,
+          credentialID,
+          counter,
+          transports,
+        };
         const c = Credential.create({ ...credentialProps });
 
         await User.create({ email, nickname, credentials: [c] }).save();
@@ -89,27 +87,74 @@ class CredentialResolver {
     }
   }
 
+  @Mutation(() => PublicKeyCredentialRequestOptionsJSON)
+  async authWebAuthnCredentialOptions(
+    @Arg("username") email: string,
+    @Ctx() ctx: Context
+  ) {
+    const user = await User.findOne({
+      where: { email },
+      relations: { credentials: true },
+    });
+
+    if (!user) throw new GraphQLError("USER_NOT_FOUND");
+
+    const options = await generateAuthenticationOptions({
+      rpID: ctx.req.hostname,
+      userVerification: "preferred",
+      timeout: 60000,
+      allowCredentials: user.credentials.map((c) => ({
+        id: c.credentialID,
+        type: "public-key",
+        transports: c.transports,
+      })),
+    });
+    return options;
+  }
+
   @Mutation(() => String)
-  async loginWebAuthn(@Arg("data") data: LoginInput, @Ctx() ctx: Context) {
-    const existingUser = await User.findOneBy({ email: data.email });
-    if (existingUser === null || !existingUser.hashedPassword)
-      throw new GraphQLError("Invalid Credentials");
-    const passwordVerified = await verify(
-      existingUser.hashedPassword,
-      data.password
+  async authWebAuthnCredential(
+    @Arg("username") email: string,
+    @Arg("challenge") challenge: string,
+    @Arg("credential") cred: CredentialAuthInput,
+
+    @Ctx() ctx: Context
+  ) {
+    const user = await User.findOne({
+      where: { email },
+      relations: { credentials: true },
+    });
+
+    if (!user) throw new GraphQLError("Invalid Credentials");
+
+    const bodyCredIDBuffer = isoBase64URL.toBuffer(cred.rawId);
+
+    const authenticator = user.credentials.find((c) =>
+      isoUint8Array.areEqual(c.credentialID, bodyCredIDBuffer)
     );
-    if (!passwordVerified) throw new GraphQLError("Invalid Credentials");
 
-    if (!existingUser.emailVerified)
-      throw new GraphQLError("EMAIL_NOT_VERIFIED");
+    if (!authenticator) throw new GraphQLError("Invalid Credentials");
 
-    const token = jwt.sign(
+    //  if (!passwordVerified) throw new GraphQLError("Invalid Credentials");
+
+    const { verified, authenticationInfo } = await verifyAuthenticationResponse(
       {
-        userId: existingUser.id,
-      },
-      env.JWT_PRIVATE_KEY,
-      { expiresIn: "30d" }
+        expectedChallenge: challenge,
+        authenticator,
+        expectedOrigin: env.FRONTEND_URL,
+        expectedRPID: ctx.req.hostname,
+        response: { ...cred, type: "public-key" },
+      }
     );
+
+    if (!verified) throw new GraphQLError("Invalid Credentials");
+
+    authenticator.counter = authenticationInfo.newCounter;
+    await authenticator.save();
+
+    const token = jwt.sign({ userId: user.id }, env.JWT_PRIVATE_KEY, {
+      expiresIn: "30d",
+    });
 
     ctx.res.cookie("token", token, {
       httpOnly: true,

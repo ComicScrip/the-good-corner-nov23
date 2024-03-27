@@ -42,6 +42,13 @@ export type AuthenticationExtensionsClientOutputs = {
   hmacCreateSecret?: InputMaybe<Scalars['Boolean']>;
 };
 
+export type AuthenticatorAssertionResponseJson = {
+  authenticatorData: Scalars['String'];
+  clientDataJSON: Scalars['String'];
+  signature: Scalars['String'];
+  userHandle?: InputMaybe<Scalars['String']>;
+};
+
 export type AuthenticatorAttestationResponseJson = {
   attestationObject: Scalars['String'];
   authenticatorData?: InputMaybe<Scalars['String']>;
@@ -65,6 +72,15 @@ export type Category = {
   name: Scalars['String'];
 };
 
+export type CredentialAuthInput = {
+  authenticatorAttachment?: InputMaybe<Scalars['String']>;
+  clientExtensionResults: AuthenticationExtensionsClientOutputs;
+  id: Scalars['String'];
+  rawId: Scalars['String'];
+  response: AuthenticatorAssertionResponseJson;
+  type: Scalars['String'];
+};
+
 export type CredentialInput = {
   authenticatorAttachment?: InputMaybe<Scalars['String']>;
   clientExtensionResults: AuthenticationExtensionsClientOutputs;
@@ -85,7 +101,8 @@ export type LoginInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  authWebAuthnCredentialOptions: PublicKeyCredentialCreationOptionsJson;
+  authWebAuthnCredential: Scalars['String'];
+  authWebAuthnCredentialOptions: PublicKeyCredentialRequestOptionsJson;
   confirmEmail: Scalars['String'];
   createAd: Ad;
   createCategory: Category;
@@ -105,8 +122,14 @@ export type Mutation = {
 };
 
 
+export type MutationAuthWebAuthnCredentialArgs = {
+  challenge: Scalars['String'];
+  credential: CredentialAuthInput;
+  username: Scalars['String'];
+};
+
+
 export type MutationAuthWebAuthnCredentialOptionsArgs = {
-  displayname: Scalars['String'];
   username: Scalars['String'];
 };
 
@@ -226,7 +249,7 @@ export type PublicKeyCredentialCreationOptionsJson = {
   attestation?: Maybe<Scalars['String']>;
   authenticatorSelection: AuthenticatorSelectionCriteria;
   challenge: Scalars['String'];
-  excludeCredentials?: Maybe<Array<PublicKeyCredentialDescriptorJson>>;
+  excludeCredentials: Array<Maybe<PublicKeyCredentialDescriptorJson>>;
   extensions?: Maybe<AuthenticationExtensionsClientInputs>;
   pubKeyCredParams: Array<PublicKeyCredentialParameters>;
   rp: PublicKeyCredentialRpEntity;
@@ -247,6 +270,16 @@ export type PublicKeyCredentialParameters = {
   type: Scalars['String'];
 };
 
+export type PublicKeyCredentialRequestOptionsJson = {
+  __typename?: 'PublicKeyCredentialRequestOptionsJSON';
+  allowCredentials: Array<PublicKeyCredentialDescriptorJson>;
+  challenge: Scalars['String'];
+  extensions?: Maybe<AuthenticationExtensionsClientInputs>;
+  rpId?: Maybe<Scalars['String']>;
+  timeout?: Maybe<Scalars['Int']>;
+  userVerification?: Maybe<Scalars['String']>;
+};
+
 export type PublicKeyCredentialRpEntity = {
   __typename?: 'PublicKeyCredentialRpEntity';
   id?: Maybe<Scalars['String']>;
@@ -264,7 +297,6 @@ export type Query = {
   __typename?: 'Query';
   ads: Array<Ad>;
   categories: Array<Category>;
-  challenge: Scalars['String'];
   getAdById: Ad;
   profile: User;
   tags: Array<Tag>;
@@ -339,6 +371,22 @@ export type AdDetailsQueryVariables = Exact<{
 
 export type AdDetailsQuery = { __typename?: 'Query', getAdById: { __typename?: 'Ad', id: number, title: string, description: string, price: number, location: string, picture: string, owner: { __typename?: 'User', id: number, nickname: string, avatar: string }, category: { __typename?: 'Category', id: number, name: string }, tags: Array<{ __typename?: 'Tag', id: number, name: string }> } };
 
+export type AuthWebAuthnCredentialMutationVariables = Exact<{
+  credential: CredentialAuthInput;
+  challenge: Scalars['String'];
+  username: Scalars['String'];
+}>;
+
+
+export type AuthWebAuthnCredentialMutation = { __typename?: 'Mutation', authWebAuthnCredential: string };
+
+export type AuthWebAuthnCredentialOptionsMutationVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+
+export type AuthWebAuthnCredentialOptionsMutation = { __typename?: 'Mutation', authWebAuthnCredentialOptions: { __typename?: 'PublicKeyCredentialRequestOptionsJSON', challenge: string, rpId?: string | null, timeout?: number | null, userVerification?: string | null, allowCredentials: Array<{ __typename?: 'PublicKeyCredentialDescriptorJSON', id: string, transports: Array<string>, type: string }>, extensions?: { __typename?: 'AuthenticationExtensionsClientInputs', appid?: string | null, hmacCreateSecret?: boolean | null, credProps?: boolean | null } | null } };
+
 export type CategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -398,11 +446,6 @@ export type AllTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type AllTagsQuery = { __typename?: 'Query', tags: Array<{ __typename?: 'Tag', id: number, name: string }> };
 
-export type ChallengeQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ChallengeQuery = { __typename?: 'Query', challenge: string };
-
 export type ProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -441,7 +484,7 @@ export type RegisterWebAuthnCredentialOptionsMutationVariables = Exact<{
 }>;
 
 
-export type RegisterWebAuthnCredentialOptionsMutation = { __typename?: 'Mutation', registerWebAuthnCredentialOptions: { __typename?: 'PublicKeyCredentialCreationOptionsJSON', challenge: string, timeout?: number | null, attestation?: string | null, rp: { __typename?: 'PublicKeyCredentialRpEntity', id?: string | null, name: string }, user: { __typename?: 'PublicKeyCredentialUserEntityJSON', displayName: string, id: string, name: string }, pubKeyCredParams: Array<{ __typename?: 'PublicKeyCredentialParameters', alg: number, type: string }>, excludeCredentials?: Array<{ __typename?: 'PublicKeyCredentialDescriptorJSON', type: string, id: string, transports: Array<string> }> | null, authenticatorSelection: { __typename?: 'AuthenticatorSelectionCriteria', authenticatorAttachment?: string | null, requireResidentKey?: boolean | null, residentKey?: string | null, userVerification?: string | null }, extensions?: { __typename?: 'AuthenticationExtensionsClientInputs', appid?: string | null, credProps?: boolean | null, hmacCreateSecret?: boolean | null } | null } };
+export type RegisterWebAuthnCredentialOptionsMutation = { __typename?: 'Mutation', registerWebAuthnCredentialOptions: { __typename?: 'PublicKeyCredentialCreationOptionsJSON', challenge: string, timeout?: number | null, attestation?: string | null, rp: { __typename?: 'PublicKeyCredentialRpEntity', id?: string | null, name: string }, user: { __typename?: 'PublicKeyCredentialUserEntityJSON', displayName: string, id: string, name: string }, pubKeyCredParams: Array<{ __typename?: 'PublicKeyCredentialParameters', alg: number, type: string }>, excludeCredentials: Array<{ __typename?: 'PublicKeyCredentialDescriptorJSON', type: string, id: string, transports: Array<string> } | null>, authenticatorSelection: { __typename?: 'AuthenticatorSelectionCriteria', authenticatorAttachment?: string | null, requireResidentKey?: boolean | null, residentKey?: string | null, userVerification?: string | null }, extensions?: { __typename?: 'AuthenticationExtensionsClientInputs', appid?: string | null, credProps?: boolean | null, hmacCreateSecret?: boolean | null } | null } };
 
 export type SearchAdsQueryVariables = Exact<{
   title?: InputMaybe<Scalars['String']>;
@@ -543,6 +586,89 @@ export function useAdDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<
 export type AdDetailsQueryHookResult = ReturnType<typeof useAdDetailsQuery>;
 export type AdDetailsLazyQueryHookResult = ReturnType<typeof useAdDetailsLazyQuery>;
 export type AdDetailsQueryResult = Apollo.QueryResult<AdDetailsQuery, AdDetailsQueryVariables>;
+export const AuthWebAuthnCredentialDocument = gql`
+    mutation AuthWebAuthnCredential($credential: CredentialAuthInput!, $challenge: String!, $username: String!) {
+  authWebAuthnCredential(
+    credential: $credential
+    challenge: $challenge
+    username: $username
+  )
+}
+    `;
+export type AuthWebAuthnCredentialMutationFn = Apollo.MutationFunction<AuthWebAuthnCredentialMutation, AuthWebAuthnCredentialMutationVariables>;
+
+/**
+ * __useAuthWebAuthnCredentialMutation__
+ *
+ * To run a mutation, you first call `useAuthWebAuthnCredentialMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAuthWebAuthnCredentialMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [authWebAuthnCredentialMutation, { data, loading, error }] = useAuthWebAuthnCredentialMutation({
+ *   variables: {
+ *      credential: // value for 'credential'
+ *      challenge: // value for 'challenge'
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useAuthWebAuthnCredentialMutation(baseOptions?: Apollo.MutationHookOptions<AuthWebAuthnCredentialMutation, AuthWebAuthnCredentialMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AuthWebAuthnCredentialMutation, AuthWebAuthnCredentialMutationVariables>(AuthWebAuthnCredentialDocument, options);
+      }
+export type AuthWebAuthnCredentialMutationHookResult = ReturnType<typeof useAuthWebAuthnCredentialMutation>;
+export type AuthWebAuthnCredentialMutationResult = Apollo.MutationResult<AuthWebAuthnCredentialMutation>;
+export type AuthWebAuthnCredentialMutationOptions = Apollo.BaseMutationOptions<AuthWebAuthnCredentialMutation, AuthWebAuthnCredentialMutationVariables>;
+export const AuthWebAuthnCredentialOptionsDocument = gql`
+    mutation AuthWebAuthnCredentialOptions($username: String!) {
+  authWebAuthnCredentialOptions(username: $username) {
+    challenge
+    rpId
+    timeout
+    allowCredentials {
+      id
+      transports
+      type
+    }
+    extensions {
+      appid
+      hmacCreateSecret
+      credProps
+    }
+    userVerification
+  }
+}
+    `;
+export type AuthWebAuthnCredentialOptionsMutationFn = Apollo.MutationFunction<AuthWebAuthnCredentialOptionsMutation, AuthWebAuthnCredentialOptionsMutationVariables>;
+
+/**
+ * __useAuthWebAuthnCredentialOptionsMutation__
+ *
+ * To run a mutation, you first call `useAuthWebAuthnCredentialOptionsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAuthWebAuthnCredentialOptionsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [authWebAuthnCredentialOptionsMutation, { data, loading, error }] = useAuthWebAuthnCredentialOptionsMutation({
+ *   variables: {
+ *      username: // value for 'username'
+ *   },
+ * });
+ */
+export function useAuthWebAuthnCredentialOptionsMutation(baseOptions?: Apollo.MutationHookOptions<AuthWebAuthnCredentialOptionsMutation, AuthWebAuthnCredentialOptionsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AuthWebAuthnCredentialOptionsMutation, AuthWebAuthnCredentialOptionsMutationVariables>(AuthWebAuthnCredentialOptionsDocument, options);
+      }
+export type AuthWebAuthnCredentialOptionsMutationHookResult = ReturnType<typeof useAuthWebAuthnCredentialOptionsMutation>;
+export type AuthWebAuthnCredentialOptionsMutationResult = Apollo.MutationResult<AuthWebAuthnCredentialOptionsMutation>;
+export type AuthWebAuthnCredentialOptionsMutationOptions = Apollo.BaseMutationOptions<AuthWebAuthnCredentialOptionsMutation, AuthWebAuthnCredentialOptionsMutationVariables>;
 export const CategoriesDocument = gql`
     query Categories {
   categories {
@@ -837,38 +963,6 @@ export function useAllTagsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Al
 export type AllTagsQueryHookResult = ReturnType<typeof useAllTagsQuery>;
 export type AllTagsLazyQueryHookResult = ReturnType<typeof useAllTagsLazyQuery>;
 export type AllTagsQueryResult = Apollo.QueryResult<AllTagsQuery, AllTagsQueryVariables>;
-export const ChallengeDocument = gql`
-    query Challenge {
-  challenge
-}
-    `;
-
-/**
- * __useChallengeQuery__
- *
- * To run a query within a React component, call `useChallengeQuery` and pass it any options that fit your needs.
- * When your component renders, `useChallengeQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useChallengeQuery({
- *   variables: {
- *   },
- * });
- */
-export function useChallengeQuery(baseOptions?: Apollo.QueryHookOptions<ChallengeQuery, ChallengeQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ChallengeQuery, ChallengeQueryVariables>(ChallengeDocument, options);
-      }
-export function useChallengeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ChallengeQuery, ChallengeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ChallengeQuery, ChallengeQueryVariables>(ChallengeDocument, options);
-        }
-export type ChallengeQueryHookResult = ReturnType<typeof useChallengeQuery>;
-export type ChallengeLazyQueryHookResult = ReturnType<typeof useChallengeLazyQuery>;
-export type ChallengeQueryResult = Apollo.QueryResult<ChallengeQuery, ChallengeQueryVariables>;
 export const ProfileDocument = gql`
     query Profile {
   profile {

@@ -17,6 +17,9 @@ export default class Credential extends BaseEntity {
   @Column({ type: "int" })
   counter: number;
 
+  @Column({ type: "varchar", array: true, default: [] })
+  transports: VerifyAuthenticationResponseOpts["authenticator"]["transports"];
+
   @ManyToOne(() => User, (u) => u.credentials)
   user: User;
 }
@@ -68,6 +71,42 @@ export class CredentialInput {
 
   @Field(() => AuthenticatorAttestationResponseJSON)
   response: AuthenticatorAttestationResponseJSON;
+
+  @Field(() => AuthenticationExtensionsClientOutputs)
+  clientExtensionResults: AuthenticationExtensionsClientOutputs;
+
+  @Field(() => String)
+  type: "public-key";
+}
+
+@InputType()
+class AuthenticatorAssertionResponseJSON {
+  @Field(() => String)
+  clientDataJSON: string;
+
+  @Field(() => String)
+  authenticatorData: string;
+
+  @Field(() => String)
+  signature: string;
+
+  @Field(() => String, { nullable: true, defaultValue: undefined })
+  userHandle?: string;
+}
+
+@InputType()
+export class CredentialAuthInput {
+  @Field(() => String, { nullable: true })
+  authenticatorAttachment?: "cross-platform" | "platform";
+
+  @Field(() => String)
+  id: string;
+
+  @Field(() => String)
+  rawId: string;
+
+  @Field(() => AuthenticatorAssertionResponseJSON)
+  response: AuthenticatorAssertionResponseJSON;
 
   @Field(() => AuthenticationExtensionsClientOutputs)
   clientExtensionResults: AuthenticationExtensionsClientOutputs;
@@ -151,7 +190,7 @@ export class PublicKeyCredentialCreationOptionsJSON {
   @Field(() => Int, { nullable: true })
   timeout?: number;
 
-  @Field(() => [PublicKeyCredentialDescriptorJSON], { nullable: true })
+  @Field(() => [PublicKeyCredentialDescriptorJSON], { nullable: "items" })
   excludeCredentials?: PublicKeyCredentialDescriptorJSON[];
 
   @Field(() => AuthenticatorSelectionCriteria)
@@ -161,6 +200,25 @@ export class PublicKeyCredentialCreationOptionsJSON {
 
   @Field(() => AuthenticationExtensionsClientInputs, { nullable: true })
   extensions?: AuthenticationExtensionsClientInputs;
+}
+
+@ObjectType()
+export class PublicKeyCredentialRequestOptionsJSON {
+  @Field() challenge: string;
+
+  @Field({ nullable: true, defaultValue: undefined }) rpId?: string;
+
+  @Field(() => Int, { nullable: true, defaultValue: undefined })
+  timeout?: number;
+
+  @Field(() => [PublicKeyCredentialDescriptorJSON])
+  allowCredentials?: PublicKeyCredentialDescriptorJSON[];
+
+  @Field(() => AuthenticationExtensionsClientInputs, { nullable: true })
+  extensions?: AuthenticationExtensionsClientInputs;
+
+  @Field(() => String, { nullable: true })
+  userVerification?: UserVerificationRequirement;
 }
 
 @InputType()

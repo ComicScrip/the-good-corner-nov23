@@ -5,6 +5,7 @@ import {
 } from "@/graphql/generated/schema";
 import { useState } from "react";
 import { startRegistration } from "@simplewebauthn/browser";
+import { useRouter } from "next/router";
 
 export default function SignupPasswordless() {
   const [registerWebAuthn] = useRegisterWebAuthnCredentialMutation();
@@ -14,9 +15,11 @@ export default function SignupPasswordless() {
 
   const [email, setEmail] = useState("");
   const [nickname, setNickname] = useState("");
+  const router = useRouter();
 
   return (
     <Layout pageTitle="Inscription sans mot de passe">
+      <h1 className="text-xl pt-4">S'inscrire</h1>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
@@ -47,9 +50,12 @@ export default function SignupPasswordless() {
 
             const credential = await startRegistration(registrationOpts as any);
 
-            await registerWebAuthn({
+            const res = await registerWebAuthn({
               variables: { challenge, credential, username, displayname },
             });
+
+            if (res.data?.registerWebAuthnCredential)
+              router.push("/login-passwordless");
           } catch (err: any) {
             if (err.message === "EMAIL_ALREADY_TAKEN")
               setError("Cet e-mail est déjà pris");
@@ -91,8 +97,8 @@ export default function SignupPasswordless() {
           </div>
         </div>
         {error !== "" && <pre className="text-red-700">{error}</pre>}
-        <button className="btn btn-primary text-white mt-12 w-full">
-          Envoyer
+        <button className="btn btn-primary text-white mt-8 w-full">
+          S'inscrire
         </button>
       </form>
     </Layout>
