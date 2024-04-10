@@ -38,6 +38,14 @@ services:
     volumes:
       - ./frontend/src:/app/src
 
+  upload-service:
+    stop_grace_period: 0s
+    build: file-upload-service
+    ports:
+      - 8001:8000
+    volumes:
+      - ./file-upload-service/files:/app/files
+
   nginx:
     stop_grace_period: 0s
     image: nginx:1.21.3
