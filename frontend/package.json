@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "codegen": "graphql-codegen --config codegen.yml --watch"
+    "codegen": "graphql-codegen --config codegen.yml --watch",
+    "test": "jest"
   },
   "dependencies": {
     "@apollo/client": "^3.8.8",
@@ -33,9 +34,17 @@
     "@graphql-codegen/typescript": "3.0.2",
     "@graphql-codegen/typescript-operations": "3.0.2",
     "@graphql-codegen/typescript-react-apollo": "3.3.7",
+    "@jest/globals": "29.7.0",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^15.0.5",
     "autoprefixer": "^10.4.16",
-    "daisyui": "^4.4.2",
     "postcss": "^8.4.31",
-    "tailwindcss": "^3.3.5"
+    "tailwindcss": "^3.3.5",
+    "daisyui": "^4.4.2",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-node": "^10.9.2",
+    "@types/jest": "^29.5.12",
+    "next-router-mock": "^0.9.12"
   }
 }
