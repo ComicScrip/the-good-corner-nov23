@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prod": "docker-compose -f docker-compose.production.yml up --build"
+    "prod": "docker-compose -f docker-compose.production.yml --env-file .env.production up --build"
   },
   "keywords": [],
   "author": "",

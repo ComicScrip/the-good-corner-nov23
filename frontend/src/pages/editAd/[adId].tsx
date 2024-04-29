@@ -118,7 +118,6 @@ export default function EditAd() {
                 <span className="label-text">Image</span>
               </label>
               <input
-                type="url"
                 name="picture"
                 id="picture"
                 value={imageURL || ad.picture}
