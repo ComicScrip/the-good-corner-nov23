@@ -3,6 +3,7 @@ services:
     image: postgres:15-alpine
     environment:
       POSTGRES_PASSWORD: postgres
+      PGUSER: postgres
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 10s
@@ -10,22 +11,39 @@ services:
       retries: 5
 
   backend:
+    env_file: backend/.env
+    environment:
+      - DB_HOST=db
     depends_on:
       db:
         condition: service_healthy
     build:
       context: backend
       dockerfile: Dockerfile.production
-    ports:
-      - 4001:4001
     volumes:
       - ./backend/src:/app/src
 
   frontend:
+    env_file: frontend/.env
     build:
       context: frontend
       dockerfile: Dockerfile.production
-    ports:
-      - 3000:3000
     volumes:
       - ./frontend/src:/app/src
+
+  upload-service:
+    stop_grace_period: 0s
+    build: file-upload-service
+    volumes:
+      - ./file-upload-service/files:/app/files
+
+  gateway:
+    restart: always
+    stop_grace_period: 0s
+    build:
+      context: gateway
+      dockerfile: Dockerfile.production
+    ports:
+      - ${GATEWAY_PORT-80}:80
+    
+
