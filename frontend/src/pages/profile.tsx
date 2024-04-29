@@ -59,7 +59,6 @@ export default function Profile() {
               <span className="label-text">Avatar</span>
             </label>
             <input
-              type="url"
               name="avatar"
               id="avatar"
               minLength={2}

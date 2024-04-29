@@ -6,8 +6,12 @@ const JWT_PRIVATE_KEY = new TextEncoder().encode(
   process.env.JWT_PRIVATE_KEY || ""
 );
 
+console.log({ JWT_PRIVATE_KEY: process.env.JWT_PRIVATE_KEY });
+
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
+
+  console.log({ token });
 
   if (token) {
     try {

@@ -95,21 +95,6 @@ export default function EditAd() {
                 className="input input-bordered w-full max-w-xs"
               />
             </div>
-
-            <div className="form-control w-full max-w-xs">
-              <label className="label" htmlFor="owner">
-                <span className="label-text">Auteur</span>
-              </label>
-              <input
-                type="text"
-                name="owner"
-                defaultValue={ad?.owner}
-                id="owner"
-                required
-                placeholder="Link"
-                className="input input-bordered w-full max-w-xs"
-              />
-            </div>
           </div>
 
           <div className="flex flex-wrap gap-6 mb-3">
@@ -133,7 +118,6 @@ export default function EditAd() {
                 <span className="label-text">Image</span>
               </label>
               <input
-                type="url"
                 name="picture"
                 id="picture"
                 value={imageURL || ad.picture}
