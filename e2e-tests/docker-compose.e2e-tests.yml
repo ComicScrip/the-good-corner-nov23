@@ -2,6 +2,7 @@ services:
   testDB:
     image: postgres:15-alpine
     restart: always
+    stop_grace_period: 0s
     environment:
       POSTGRES_PASSWORD: postgres
     healthcheck:
@@ -14,6 +15,7 @@ services:
       - 5432:5432
 
   backend:
+    stop_grace_period: 0s
     env_file:
       - ./.env
     build: ../backend
@@ -33,6 +35,7 @@ services:
         condition: service_healthy
 
   client:
+    stop_grace_period: 0s
     build: '../frontend'
     environment:
       - NEXT_PUBLIC_GRAPHQL_API_URL=http://localhost:4001

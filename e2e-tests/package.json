@@ -4,11 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx playwright test -c dist/e2e-tests --trace on",
-    "test:gui": "npm run pretest && npx playwright test -c dist/e2e-tests --trace on --headed",
-    "test:watch": "npm run test && chokidar 'src/**/*.spec.ts' -c 'npm run test'",
-    "test:watch:gui": "npm run test:gui && chokidar 'src/**/*.spec.ts' -c 'npm run test:gui'",
     "pretest": "tsc --incremental -p tsconfig.json",
+    "test": "npx playwright test -c dist/e2e-tests --trace on",
+    "test:watch": "npm run test && chokidar 'src/**/*.spec.ts' -c 'npm run test'",
+    "test:ui": "npm run pretest && npx playwright test -c dist/e2e-tests --trace on --ui",
+    "test:headed": "npm run pretest && npx playwright test -c dist/e2e-tests --trace on --headed",
+    "test:watch:headed": "npm run test:headed && chokidar 'src/**/*.spec.ts' -c 'npm run pretest'",
     "app:start": "docker compose -f docker-compose.e2e-tests.yml up --wait",
     "app:stop": "docker compose -f docker-compose.e2e-tests.yml down"
   },
@@ -19,18 +20,15 @@
     "@playwright/test": "^1.43.1"
   },
   "dependencies": {
-    "apollo-server": "^3.10.3",
-    "apollo-server-core": "^3.10.3",
-    "apollo-server-errors": "^3.3.1",
-    "argon2": "^0.30.2",
+    "argon2": "^0.40.1",
     "chokidar-cli": "^3.0.0",
-    "class-validator": "^0.13.2",
-    "graphql": "^15.3.0",
-    "pg": "^8.8.0",
-    "reflect-metadata": "^0.1.13",
-    "ts-dotenv": "^0.9.0",
-    "type-graphql": "^1.1.1",
-    "typeorm": "^0.3.9",
-    "typescript": "^4.7.3"
+    "class-validator": "^0.14.0",
+    "graphql": "^16.8.1",
+    "pg": "^8.11.5",
+    "reflect-metadata": "^0.2.2",
+    "ts-dotenv": "^0.9.1",
+    "type-graphql": "^2.0.0-rc.1",
+    "typeorm": "^0.3.20",
+    "typescript": "^5.4.5"
   }
 }
