@@ -5,7 +5,7 @@ import Tag from "./entities/Tag";
 import env from "./env";
 import User from "./entities/User";
 
-export default new DataSource({
+const db = new DataSource({
   type: "postgres",
   host: env.DB_HOST,
   port: env.DB_PORT,
@@ -14,4 +14,15 @@ export default new DataSource({
   database: env.DB_NAME,
   entities: [Ad, Category, Tag, User],
   synchronize: true,
+  logging: env.NODE_ENV !== "test",
 });
+
+export async function clearDB() {
+  const entities = db.entityMetadatas;
+  const tableNames = entities
+    .map((entity) => `"${entity.tableName}"`)
+    .join(", ");
+  await db.query(`TRUNCATE ${tableNames} RESTART IDENTITY CASCADE;`);
+}
+
+export default db;
