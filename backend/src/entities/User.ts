@@ -78,7 +78,7 @@ export class NewUserInput {
   avatar?: string;
 
   @Field()
-  @IsStrongPassword()
+  //@IsStrongPassword()
   password: string;
 }
 
@@ -100,7 +100,7 @@ export class LoginInput {
   email: string;
 
   @Field()
-  @IsStrongPassword()
+  //@IsStrongPassword()
   password: string;
 }
 
