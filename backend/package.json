@@ -7,7 +7,9 @@
     "start": "ts-node-dev ./src/index.ts",
     "resetDB": "ts-node-dev src/resetDb.ts",
     "build": "tsc",
-    "start:prod": "node build/index.js"
+    "start:prod": "node build/index.js",
+    "test": "jest",
+    "testDB:wait": "docker compose -f docker-compose.integration-tests.yml up testDB --wait"
   },
   "keywords": [
     "ads"
@@ -37,7 +39,11 @@
     "@types/cookie": "^0.6.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.6",
-    "@types/nodemailer": "^6.4.14"
+    "@types/nodemailer": "^6.4.14",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "graphql-tag": "^2.12.6"
   }
 }
