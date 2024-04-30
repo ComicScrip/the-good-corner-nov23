@@ -34,6 +34,8 @@ services:
 
   client:
     build: '../frontend'
+    environment:
+      - NEXT_PUBLIC_GRAPHQL_API_URL=http://localhost:4001
     ports:
       - 3000:3000
     volumes:

@@ -16,7 +16,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.29.0"
+    "@playwright/test": "^1.43.1"
   },
   "dependencies": {
     "apollo-server": "^3.10.3",
