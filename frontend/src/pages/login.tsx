@@ -76,6 +76,7 @@ export default function Login() {
                   <span className="label-text">Email</span>
                 </label>
                 <input
+                  data-testid="login-email"
                   required
                   type="email"
                   name="email"
@@ -90,6 +91,7 @@ export default function Login() {
                   <span className="label-text">Mot de passe</span>
                 </label>
                 <input
+                  data-testid="login-password"
                   type="password"
                   name="password"
                   id="password"
