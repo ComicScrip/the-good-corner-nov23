@@ -1,9 +1,9 @@
 import Layout from "@/components/Layout";
 import { useRouter } from "next/router";
-import { UserCircleIcon } from "@heroicons/react/24/outline";
-import { MapPinIcon } from "@heroicons/react/24/outline";
+import { LocationMarkerIcon } from "@heroicons/react/outline";
+import { PencilIcon } from "@heroicons/react/outline";
+import { TrashIcon } from "@heroicons/react/outline";
 import Link from "next/link";
-import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/solid";
 import {
   useAdDetailsQuery,
   useDeleteAdMutation,
@@ -71,7 +71,7 @@ export default function AdDetails() {
                 </div>
 
                 <div className="flex items-center mt-2 ">
-                  <MapPinIcon width={24} height={24} className="mr-2" />{" "}
+                  <LocationMarkerIcon width={24} height={24} className="mr-2" />{" "}
                   {ad.location}
                 </div>
               </div>
@@ -82,7 +82,7 @@ export default function AdDetails() {
                     href={`/editAd/${ad.id}`}
                     className="flex items-center mt-3 cursor-pointer"
                   >
-                    <PencilSquareIcon width={24} height={24} className="mr-2" />
+                    <PencilIcon width={24} height={24} className="mr-2" />
                     Editer l'annonce
                   </Link>
 
