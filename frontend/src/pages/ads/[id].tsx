@@ -77,7 +77,10 @@ export default function AdDetails() {
               </div>
 
               {canEditAd && (
-                <div className="flex justify-between border-t pt-2 items-center ">
+                <div
+                  className="flex justify-between border-t pt-2 items-center "
+                  data-testid="editAdBtn"
+                >
                   <Link
                     href={`/editAd/${ad.id}`}
                     className="flex items-center mt-3 cursor-pointer"
@@ -87,6 +90,7 @@ export default function AdDetails() {
                   </Link>
 
                   <div
+                    data-testid="deleteAdBtn"
                     className="flex items-center mt-3 cursor-pointer"
                     onClick={() => {
                       if (
