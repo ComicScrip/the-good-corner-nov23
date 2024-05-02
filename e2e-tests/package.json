@@ -1,0 +1,34 @@
+{
+  "name": "e2e-tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "tsc --incremental -p tsconfig.json",
+    "test": "npx playwright test -c dist/e2e-tests --trace on",
+    "test:watch": "npm run test && chokidar 'src/**/*.spec.ts' -c 'npm run test'",
+    "test:ui": "npm run pretest && npx playwright test -c dist/e2e-tests --trace on --ui",
+    "test:headed": "npm run pretest && npx playwright test -c dist/e2e-tests --trace on --headed",
+    "test:watch:headed": "npm run test:headed && chokidar 'src/**/*.spec.ts' -c 'npm run pretest'",
+    "app:start": "docker compose -f docker-compose.e2e-tests.yml up --wait",
+    "app:stop": "docker compose -f docker-compose.e2e-tests.yml down"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.43.1"
+  },
+  "dependencies": {
+    "argon2": "^0.40.1",
+    "chokidar-cli": "^3.0.0",
+    "class-validator": "^0.14.0",
+    "graphql": "^16.8.1",
+    "pg": "^8.11.5",
+    "reflect-metadata": "^0.2.2",
+    "ts-dotenv": "^0.9.1",
+    "type-graphql": "^2.0.0-rc.1",
+    "typeorm": "^0.3.20",
+    "typescript": "^5.4.5"
+  }
+}

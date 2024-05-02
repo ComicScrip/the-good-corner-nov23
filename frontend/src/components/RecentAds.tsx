@@ -9,7 +9,7 @@ export default function RecentAds() {
     <div className="pt-6">
       <h2 className="text-2xl mb-6">Annonces récentes</h2>
 
-      <section className="flex flex-wrap pb-24">
+      <section className="flex flex-wrap pb-24" data-testid="ads-list">
         {ads.map((ad) => (
           <AdCard key={ad.id} ad={ad} link={`/ads/${ad.id}`} />
         ))}
