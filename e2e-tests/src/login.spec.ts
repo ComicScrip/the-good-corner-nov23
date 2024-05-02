@@ -18,11 +18,12 @@ test("can log in with correct credentials", async ({ page }) => {
   await u.save();
 
   await page.goto("/login");
+
   await page.getByTestId("login-email").fill(email);
   await page.getByTestId("login-password").fill(password);
-  await page.getByRole("button", { name: "Se Connecter" }).click();
+  await page.getByRole("button", { name: "Se connecter" }).click();
   await expect(
-    page.getByRole("button", { name: "Se Déconnecter" })
+    page.getByRole("button", { name: "Se déconnecter" })
   ).toBeVisible();
 });
 
@@ -34,10 +35,13 @@ test("cannot log in with incorrect password", async ({ page }) => {
   await u.save();
 
   await page.goto("/login");
+
   await page.getByTestId("login-email").fill(email);
-  await page.getByTestId("login-password").fill("1T!ESTNngnotcorrect");
-  await page.getByRole("button", { name: "Se Connecter" }).click();
-  await expect(page.getByText("Identifiants incorrects")).toBeVisible();
+  await page.getByTestId("login-password").fill("1T!ESTINg");
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await expect(page.getByTestId("login-errors")).toContainText(
+    "Identifiants incorrects"
+  );
 });
 
 test("cannot log in with incorrect email", async ({ page }) => {
@@ -48,8 +52,11 @@ test("cannot log in with incorrect email", async ({ page }) => {
   await u.save();
 
   await page.goto("/login");
-  await page.getByTestId("login-email").fill("not@correct.com");
+
+  await page.getByTestId("login-email").fill("john.doe@mail.com");
   await page.getByTestId("login-password").fill(password);
-  await page.getByRole("button", { name: "Se Connecter" }).click();
-  await expect(page.getByText("Identifiants incorrects")).toBeVisible();
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await expect(page.getByTestId("login-errors")).toContainText(
+    "Identifiants incorrects"
+  );
 });

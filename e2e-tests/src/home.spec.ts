@@ -54,13 +54,17 @@ test("can view ads in db", async ({ page }) => {
   }).save();
 
   await page.goto("/");
-  await page.getByRole("heading", { name: "Annonces Récentes" });
+  await expect(
+    page.getByRole("heading", {
+      name: "Annonces Récentes",
+    })
+  ).toBeVisible();
 
   await expect(page.getByTestId("ads-list")).toContainText(peugeot.title);
   await expect(page.getByTestId("ads-list")).toContainText(
     peugeot.price.toString()
   );
-  await expect(page.getByTestId("ads-list")).toContainText(peugeot.title);
+  await page.pause();
   await expect(page.getByTestId("ads-list")).toContainText(keyboard.title);
   await expect(page.getByTestId("ads-list")).toContainText(
     keyboard.price.toString()
