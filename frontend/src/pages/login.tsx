@@ -101,7 +101,11 @@ export default function Login() {
               </div>
             </div>
 
-            {error !== "" && <pre className="text-red-700">{error}</pre>}
+            {error !== "" && (
+              <pre data-testid="login-errors" className="text-red-700">
+                {error}
+              </pre>
+            )}
             <button className="btn btn-primary text-white mt-12 w-full">
               Se connecter
             </button>
