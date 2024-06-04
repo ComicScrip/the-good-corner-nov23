@@ -2,7 +2,6 @@ name: e2e-tests
 
 on:
   pull_request:
-  workflow_call:
 
 jobs:
   e2e-tests:
@@ -15,7 +14,6 @@ jobs:
       # https://github.com/satackey/action-docker-layer-caching
       - uses: satackey/action-docker-layer-caching@v0.0.11
         # Ignore the failure of a step and avoid terminating the job.
-
         continue-on-error: true
       - uses: actions/setup-node@v4
         with:
@@ -24,7 +22,6 @@ jobs:
         run: npm ci
       - name: Install backend dependencies
         run: cd ../backend && npm ci
-
       # https://github.com/microsoft/playwright/issues/7249#issuecomment-1385567519
       - name: Store Playwright's Version
         run: |
@@ -40,7 +37,6 @@ jobs:
       - name: Setup Playwright
         if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
-
       - name: Make envfiles
         run: |
           cp .env.example .env

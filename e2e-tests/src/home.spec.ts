@@ -56,7 +56,7 @@ test("can view ads in db", async ({ page }) => {
   await page.goto("/");
   await expect(
     page.getByRole("heading", {
-      name: "Annonces Récentes",
+      name: "Annonces Rcentes",
     })
   ).toBeVisible();
 
