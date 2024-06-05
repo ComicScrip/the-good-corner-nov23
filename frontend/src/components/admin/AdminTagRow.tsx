@@ -1,9 +1,9 @@
 import { Tag } from "@/types";
 import { useState } from "react";
-import { TrashIcon } from "@heroicons/react/24/outline";
-import { PencilSquareIcon } from "@heroicons/react/24/outline";
-import { CheckIcon } from "@heroicons/react/24/outline";
-import { XCircleIcon } from "@heroicons/react/24/outline";
+import { TrashIcon } from "@heroicons/react/outline";
+import { PencilIcon } from "@heroicons/react/outline";
+import { CheckIcon } from "@heroicons/react/outline";
+import { XCircleIcon } from "@heroicons/react/outline";
 import { useUpdateTagMutation } from "@/graphql/generated/schema";
 
 interface AdminTagRowProps {
@@ -68,7 +68,7 @@ export default function AdminTagRow({
         ) : (
           <div>
             <button onClick={() => setIsEditing(true)}>
-              <PencilSquareIcon width={24} height={24} />
+              <PencilIcon width={24} height={24} />
             </button>
             <button
               onClick={() => {
