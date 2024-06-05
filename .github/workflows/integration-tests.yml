@@ -1,7 +1,8 @@
 name: "integration-tests"
 
-on: pull_request
-
+on:
+  pull_request:
+  
 jobs:
   test-server:
     runs-on: ubuntu-latest
@@ -15,11 +16,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: "Install deps"
-        run: npm ci
-      - name: "Create env file"
+      - name: Make envfile
         run: cp .env.example .env
-      - name: "Open test database"
+      - name: Install deps
+        run: npm ci
+      - name: Start test DB
         run: npm run testDB:wait
-      - name: "Execute tests"
+      - name: Run tests
         run: npm test

@@ -1,6 +1,7 @@
-name: "tests-frontend"
+name: "test-frontend"
 
-on: pull_request
+on:
+  pull_request:
 
 jobs:
   test-client:
@@ -15,7 +16,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: "Install deps"
+      - name: Install deps
         run: npm ci
-      - name: "Execute tests"
+      - name: Run tests
         run: npm test

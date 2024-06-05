@@ -1,0 +1,55 @@
+name: e2e-tests
+
+on:
+  pull_request:
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./e2e-tests
+    steps:
+      - uses: actions/checkout@v4
+      # https://github.com/satackey/action-docker-layer-caching
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        # Ignore the failure of a step and avoid terminating the job.
+        continue-on-error: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Dependencies
+        run: npm ci
+      - name: Install backend dependencies
+        run: cd ../backend && npm ci
+      # https://github.com/microsoft/playwright/issues/7249#issuecomment-1385567519
+      - name: Store Playwright's Version
+        run: |
+          PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//')
+          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      - name: Cache Playwright Browsers for Playwright's Version
+        id: cache-playwright-browsers
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Setup Playwright
+        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+      - name: Make envfiles
+        run: |
+          cp .env.example .env
+          cd ../backend/ && cp .env.example .env 
+          cd ../frontend/ && cp .env.example .env
+      - name: Start app
+        run: npm run app:start
+      - name: Run Playwright tests
+        run: npm run test
+      - name: Store Artifacts from Failed Tests
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: e2e-tests/test-results/
+          retention-days: 7

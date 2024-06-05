@@ -1,0 +1,49 @@
+name: Test, compile and push client and server to production
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  client-tests:
+    uses: ComicScrip/the-good-corner-nov23/.github/workflows/tests-front.yml@main
+
+  e2e-tests:
+    uses: ComicScrip/the-good-corner-nov23/.github/workflows/e2e-tests.yml@main
+
+  integration-tests:
+    uses: ComicScrip/the-good-corner-nov23/.github/workflows/integration-tests.yml@main
+
+  build-and-push-server:
+    needs:
+      - integration-tests
+      - e2e-tests
+    uses: ComicScrip/the-good-corner-nov23/.github/workflows/build-backend.yml@main
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+    with:
+      image_name: scrip/the-good-corner-nov23-back
+
+  build-and-push-client:
+    needs:
+      - client-tests
+      - e2e-tests
+    uses: ComicScrip/the-good-corner-nov23/.github/workflows/build-frontend.yml@main
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+    with:
+      image_name: scrip/the-good-corner-nov23-front
+
+  notify-vps:
+    needs:
+      - build-and-push-client
+      - build-and-push-server
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call VPS webhook to update production
+        uses: wei/curl@master
+        with:
+          args: https://ops.the-good-corner-nov23.duckdns.org/hooks/update-production
