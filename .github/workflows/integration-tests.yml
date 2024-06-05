@@ -1,0 +1,25 @@
+name: "integration-tests"
+
+on: pull_request
+
+jobs:
+  test-server:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: "Install deps"
+        run: npm ci
+      - name: "Create env file"
+        run: cp .env.example .env
+      - name: "Open test database"
+        run: npm run testDB:wait
+      - name: "Execute tests"
+        run: npm test
