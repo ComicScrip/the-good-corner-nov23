@@ -16,6 +16,7 @@ export default function AdCard({
           <img
             className="h-[200px] w-full object-cover rounded-md"
             src={picture}
+            alt={title}
           />
           <div className="flex justify-between pt-6">
             <div className="ad-card-title">{title}</div>

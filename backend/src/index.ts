@@ -9,7 +9,6 @@ import express from "express";
 import http from "http";
 import cors from "cors";
 import { Context } from "./types";
-import User from "./entities/User";
 
 const app = express();
 const httpServer = http.createServer(app);
