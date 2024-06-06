@@ -16,13 +16,13 @@ export default function EmailConfirmation() {
           router.push("/login");
         }, 5000);
       });
-  }, [token]);
+  }, [token, confirmEmail, router]);
 
   return (
     <Layout pageTitle="Merci d'avoir confimé votre email">
       <p>
-        Merci d'avoir confimé votre email. Vous allez etre redirigé.e vers la
-        page de connexion dans quelques instants.
+        Merci d&apos;avoir confimé votre email. Vous allez etre redirigé.e vers
+        la page de connexion dans quelques instants.
       </p>
     </Layout>
   );
