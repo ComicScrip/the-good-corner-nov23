@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import db from "./db";
 import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
 import schemaIsBuilt from "./schema";
 import env from "./env";
 import { expressMiddleware } from "@apollo/server/express4";
@@ -10,7 +9,6 @@ import express from "express";
 import http from "http";
 import cors from "cors";
 import { Context } from "./types";
-
 const app = express();
 const httpServer = http.createServer(app);
 

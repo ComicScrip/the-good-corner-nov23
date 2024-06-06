@@ -1,7 +1,6 @@
 import { Resolver, Mutation, Arg, Query, Authorized } from "type-graphql";
 import { GraphQLError } from "graphql";
 import Tag, { NewTagInput, UpdateTagInput } from "../entities/Tag";
-import { validate } from "class-validator";
 import { Like } from "typeorm";
 import { UserRole } from "../entities/User";
 
