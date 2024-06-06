@@ -13,6 +13,7 @@ exports[`AdCard component renders correctly 1`] = `
           class="shadow-md border rounded-lg  p-6 bg-white mr-3 mb-3"
         >
           <img
+            alt="Mon annonce"
             class="h-[200px] w-full object-cover rounded-md"
             src="https://img.com/img.png"
           />
