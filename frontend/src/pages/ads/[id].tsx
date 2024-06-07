@@ -86,7 +86,7 @@ export default function AdDetails() {
                     className="flex items-center mt-3 cursor-pointer"
                   >
                     <PencilIcon width={24} height={24} className="mr-2" />
-                    Editer l'annonce
+                    Editer l&apos;annonce
                   </Link>
 
                   <div
@@ -104,7 +104,7 @@ export default function AdDetails() {
                     }}
                   >
                     <TrashIcon width={24} height={24} className="mr-2" />
-                    Supprimer l'annonce
+                    Supprimer l&apos;annonce
                   </div>
                 </div>
               )}

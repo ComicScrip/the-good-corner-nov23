@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import db from "./db";
 import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
 import schemaIsBuilt from "./schema";
 import env from "./env";
 import { expressMiddleware } from "@apollo/server/express4";
