@@ -16,7 +16,7 @@ export const authChecker: AuthChecker<Context> = async (
   const token = tokenInAuthHeaders ?? tokenInCookie;
   if (typeof token !== "string") return false;
 
-  const decoded = (await jwt.verify(token, env.JWT_PRIVATE_KEY)) as JwtPayload;
+  const decoded = jwt.verify(token, env.JWT_PRIVATE_KEY) as JwtPayload;
   if (!decoded?.userId) return false;
 
   const currentUser = await User.findOneByOrFail({ id: decoded?.userId });
