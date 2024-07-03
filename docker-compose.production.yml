@@ -26,18 +26,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    build:
-      context: backend
-      dockerfile: Dockerfile.production
+    image: scrip/the-good-corner-nov23-back
 
   frontend:
     environment:
       JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY:-changeme}
     stop_grace_period: 0s
     env_file: frontend/.env
-    build:
-      context: frontend
-      dockerfile: Dockerfile.production
+    image: scrip/the-good-corner-nov23-front
 
   upload-service:
     environment:
@@ -55,7 +51,7 @@ services:
       dockerfile: Dockerfile.production
     ports:
       - ${GATEWAY_PORT-80}:80
-    
+
 volumes:
   prodDB:
   prodUploads:
