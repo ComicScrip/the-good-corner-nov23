@@ -18,7 +18,10 @@ services:
     environment:
       DB_HOST: db
       DB_PASS: ${DB_PASS-postgres}
+      DB_PORT: ${DB_PORT-5432}
       DB_USER: ${DB_USER-postgres}
+      DB_NAME: ${DB_NAME-postgres}
+      SERVER_PORT: ${SERVER_PORT-4001}
       JWT_PRIVATE_KEY: ${JWT_PRIVATE_KEY:-changeme}
       NODE_ENV: ${NODE_ENV:-production}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-changeme}
@@ -28,7 +31,6 @@ services:
       SMTP_PASS: ${SMTP_PASS:-api-key}
       EMAIL_FROM: ${EMAIL_FROM:-contact@app.com}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
-
     depends_on:
       db:
         condition: service_healthy
@@ -44,7 +46,7 @@ services:
     environment:
       - HOST=/
     stop_grace_period: 0s
-    build: file-upload-service
+    image: scrip/file-upload-service
     volumes:
       - prodUploads:/app/files
 
