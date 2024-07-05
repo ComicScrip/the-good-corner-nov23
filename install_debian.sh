@@ -4,6 +4,7 @@ read -p "duckdns prefix (eg: \"myapp\", if your domain is myapp.duckdns.org): " 
 read -p "duckdns token (eg: 00casd01-95d0-42b5-a43c-e1c156facbae7): " DUCKDNS_TOKEN && \
 read -p "site port [443]: " PORT && \
 PORT=${PORT:-443} && \
+WD=$(pwd)
 
 sudo apt-get update && \
 
@@ -19,7 +20,7 @@ echo \
 sudo apt-get update && \
 
 # Install Docker, Caddy, Go, Webhook, Fail2ban
-sudo apt-get install -y debian-keyring debian-archive-keyring apt-transport-https fail2ban golang-1.22-go caddy docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
+sudo apt-get install -y webhook debian-keyring debian-archive-keyring apt-transport-https fail2ban golang-1.22-go caddy docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
 
 # Configure fail2ban
 sudo chmod o+w /etc/fail2ban/jail.local && \
@@ -60,4 +61,31 @@ https://ops.$DNS_PREFIX.duckdns.org:$PORT {
 }
 EOF
 sudo systemctl start caddy && \
+
+# Configure webhook and restart
+
+sudo touch /etc/webhook.conf && \
+sudo chmod o+w /etc/webhook.conf && \
+sudo cat <<EOF > /etc/webhook.conf
+[
+  {
+    "id": "update-production",
+    "execute-command": "$WD/deploy-production.sh",
+    "command-working-directory": "$WD"
+  }
+]
+EOF
+
+sudo chmod o+w /lib/systemd/system/webhook.service && \
+sudo cat <<EOF > /lib/systemd/system/webhook.service
+[Service]
+ExecStart=/usr/bin/webhook -verbose -nopanic -hooks /etc/webhook.conf
+User=$USER
+Group=$USER
+EOF
+
+sudo systemctl daemon-reload && \
+sudo systemctl restart webhook && \
+
+# To enable running docker without sudo
 newgrp docker
