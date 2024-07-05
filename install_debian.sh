@@ -23,12 +23,13 @@ sudo apt-get update && \
 sudo apt-get install -y webhook debian-keyring debian-archive-keyring apt-transport-https fail2ban golang-1.22-go caddy docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
 
 # Configure fail2ban
+sudo touch /etc/fail2ban/jail.local && \
 sudo chmod o+w /etc/fail2ban/jail.local && \
 sudo cat <<EOF > /etc/fail2ban/jail.local
 [ssh-ddos]
 enabled = true
 EOF
-/etc/init.d/fail2ban restart && \
+sudo /etc/init.d/fail2ban restart && \
 # Confirgure docker
 sudo groupadd -f docker && \
 sudo usermod -aG docker $USER && \
