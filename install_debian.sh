@@ -51,11 +51,16 @@ sudo update-alternatives --install /usr/bin/caddy caddy /usr/bin/caddy.custom 50
 sudo chmod o+w /etc/caddy/Caddyfile && \
 sudo cat <<EOF > /etc/caddy/Caddyfile
 https://$DNS_PREFIX.duckdns.org:$PORT {
-    tls { dns duckdns $DUCKDNS_TOKEN }
+    tls { 
+        dns duckdns $DUCKDNS_TOKEN 
+    }
     reverse_proxy localhost:8000
 }
 
 https://ops.$DNS_PREFIX.duckdns.org:$PORT {
+    tls { 
+        dns duckdns $DUCKDNS_TOKEN 
+    }
     reverse_proxy localhost:9000
 }
 EOF
@@ -89,6 +94,7 @@ EOF
 sudo systemctl daemon-reload && \
 sudo systemctl enable webhook && \
 sudo systemctl restart webhook && \
+echo "✨ DONE ! ✨ Once deployed, your site will be available at https://$DNS_PREFIX.duckdns.org:$PORT"
 
 # To enable running docker without sudo
 newgrp docker
