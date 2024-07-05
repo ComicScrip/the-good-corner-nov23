@@ -47,9 +47,7 @@ sudo dpkg-divert --divert /usr/bin/caddy.default --rename /usr/bin/caddy && \
 sudo mv ./caddy /usr/bin/caddy.custom && \
 sudo update-alternatives --install /usr/bin/caddy caddy /usr/bin/caddy.default 10 && \
 sudo update-alternatives --install /usr/bin/caddy caddy /usr/bin/caddy.custom 50 && \
-
 # Configure caddy and restart
-
 sudo chmod o+w /etc/caddy/Caddyfile && \
 sudo cat <<EOF > /etc/caddy/Caddyfile
 https://$DNS_PREFIX.duckdns.org:$PORT {
