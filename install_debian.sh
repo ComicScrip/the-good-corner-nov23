@@ -52,8 +52,11 @@ sudo chmod o+w /etc/caddy/Caddyfile && \
 sudo cat <<EOF > /etc/caddy/Caddyfile
 https://$DNS_PREFIX.duckdns.org:$PORT {
     tls { dns duckdns $DUCKDNS_TOKEN }
-    
     reverse_proxy localhost:8000
+}
+
+https://ops.$DNS_PREFIX.duckdns.org:$PORT {
+    reverse_proxy localhost:9000
 }
 EOF
 sudo systemctl start caddy && \
