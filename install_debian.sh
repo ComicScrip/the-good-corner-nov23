@@ -82,9 +82,13 @@ sudo cat <<EOF > /lib/systemd/system/webhook.service
 ExecStart=/usr/bin/webhook -verbose -nopanic -hooks /etc/webhook.conf
 User=$USER
 Group=$USER
+
+[Install]
+WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload && \
+sudo systemctl enable webhook && \
 sudo systemctl restart webhook && \
 
 # To enable running docker without sudo
