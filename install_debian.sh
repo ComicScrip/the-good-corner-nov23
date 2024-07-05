@@ -6,6 +6,8 @@ read -p "site port [443]: " PORT && \
 PORT=${PORT:-443} && \
 
 sudo apt-get update && \
+
+# Preapre docker install
 sudo apt-get install ca-certificates curl && \
 sudo install -m 0755 -d /etc/apt/keyrings && \
 sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc && \
@@ -15,29 +17,43 @@ echo \
  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null && \
 sudo apt-get update && \
-sudo apt-get install -y golang-1.22-go caddy git-all docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
+
+# Install Docker, Caddy, Go, Webhook, Fail2ban
+sudo apt-get install -y debian-keyring debian-archive-keyring apt-transport-https fail2ban golang-1.22-go caddy docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
+
+# Configure fail2ban
+sudo chmod o+w /etc/fail2ban/jail.local && \
+sudo cat <<EOF > /etc/fail2ban/jail.local
+[ssh-ddos]
+enabled = true
+EOF
+/etc/init.d/fail2ban restart && \
+# Confirgure docker
 sudo groupadd -f docker && \
 sudo usermod -aG docker $USER && \
+
+# Configure Go and xcaddy : https://github.com/caddyserver/xcaddy
 sudo update-alternatives --install /usr/local/bin/go go /usr/lib/go-1.22/bin/go 1 && \
-rm -rf caddy_with_duckdns && mkdir caddy_with_duckdns && cd caddy_with_duckdns && \
-sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https && \
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/xcaddy/gpg.key' | sudo gpg --dearmor --batch --yes -o /usr/share/keyrings/caddy-xcaddy-archive-keyring.gpg && \
 curl -1sLf 'https://dl.cloudsmith.io/public/caddy/xcaddy/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-xcaddy.list && \
 sudo apt update && sudo apt upgrade && \
 sudo apt install xcaddy && \
+
+# Complile custom version of caddy with duckdns plugin
 xcaddy build --with github.com/caddy-dns/duckdns && \
 sudo dpkg-divert --divert /usr/bin/caddy.default --rename /usr/bin/caddy && \
 sudo mv ./caddy /usr/bin/caddy.custom && \
 sudo update-alternatives --install /usr/bin/caddy caddy /usr/bin/caddy.default 10 && \
 sudo update-alternatives --install /usr/bin/caddy caddy /usr/bin/caddy.custom 50 && \
-sudo chmod o+w /etc/caddy/Caddyfile
+
+# Configure caddy and restart
+
+sudo chmod o+w /etc/caddy/Caddyfile && \
 sudo cat <<EOF > /etc/caddy/Caddyfile
 https://$DNS_PREFIX.duckdns.org:$PORT {
-    tls {
-        dns duckdns $DUCKDNS_TOKEN
-    }
-    root * /usr/share/caddy
-    file_server
+    tls { dns duckdns $DUCKDNS_TOKEN }
+    
+    reverse_proxy localhost:8000
 }
 EOF
 sudo systemctl start caddy && \
