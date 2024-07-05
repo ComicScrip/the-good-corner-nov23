@@ -36,9 +36,3 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-
-# Install on Debian 12
-
-```bash
-sudo apt update && sudo apt install -y git && mkdir -p apps/tgc/prod && cd apps/tgc/prod && git clone https://github.com/ComicScrip/the-good-corner-nov23.git . && bash scripts/install_debian.sh
-```

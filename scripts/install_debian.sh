@@ -40,6 +40,5 @@ https://$DNS_PREFIX.duckdns.org:$PORT {
     file_server
 }
 EOF
-sudo systemctl stop apache2 && \
 sudo systemctl start caddy && \
 newgrp docker
