@@ -16,9 +16,9 @@ jobs:
     uses: ComicScrip/the-good-corner-nov23/.github/workflows/integration-tests.yml@main
 
   build-and-push-server:
-    #needs:
-    #  - integration-tests
-    #  - e2e-tests
+    needs:
+      - integration-tests
+      - e2e-tests
     uses: ComicScrip/the-good-corner-nov23/.github/workflows/build-backend.yml@main
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -27,9 +27,9 @@ jobs:
       image_name: scrip/the-good-corner-nov23-back
 
   build-and-push-client:
-    #needs:
-    #  - client-tests
-    #  - e2e-tests
+    needs:
+      - client-tests
+      - e2e-tests
     uses: ComicScrip/the-good-corner-nov23/.github/workflows/build-frontend.yml@main
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
