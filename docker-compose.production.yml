@@ -59,6 +59,16 @@ services:
     ports:
       - ${GATEWAY_PORT-80}:80
 
+  discord-notifier:
+    image: scrip/discord-notifier
+    depends_on:
+      gateway:
+        condition: service_started
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN:-}
+      - CHANNEL_ID=${CHANNEL_ID:-}
+    command: "npm run send-message 'production env has been updated : https://pierre.wns.wilders.dev'"
+
 volumes:
   prodDB:
   prodUploads:
