@@ -36,6 +36,7 @@ EOF
 sudo /etc/init.d/fail2ban restart && \
 # Confirgure docker
 sudo groupadd -f docker && \
+
 sudo usermod -aG docker $USER && \
 
 # Configure Go and xcaddy : https://github.com/caddyserver/xcaddy
