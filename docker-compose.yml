@@ -16,7 +16,8 @@ services:
   backend:
     stop_grace_period: 0s
     environment:
-      - DB_HOST=db
+      DB_HOST: db
+      KVSTORE_HOST: ${KVSTORE_HOST:-kvStore}
     depends_on:
       db:
         condition: service_healthy
@@ -41,3 +42,10 @@ services:
       - 3000:3000
     volumes:
       - ./frontend/src:/app/src
+
+  kvStore:
+    image: valkey/valkey:7.2.5-alpine3.19
+    stop_grace_period: 0s
+    command: valkey-server --save 1 1 --loglevel warning
+    volumes:
+      - prodKVStore:/data
