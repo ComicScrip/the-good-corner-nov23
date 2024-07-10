@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import User, { UserRole } from "../../src/entities/User";
 import env from "../../src/env";
+import { sessionStore } from "../../jest.setup";
 
 export default async function () {
   const admin = new User();
@@ -12,6 +13,7 @@ export default async function () {
     emailVerified: true,
   });
   await admin.save();
+  await sessionStore.setUser(admin);
   const JWT = jwt.sign({ userId: admin.id }, env.JWT_PRIVATE_KEY);
 
   return { JWT, admin };

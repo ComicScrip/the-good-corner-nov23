@@ -23,7 +23,7 @@ const kvStore: KVStore = {
   },
 };
 
-const sessionStore: SessionService = new SessionService(kvStore);
+export const sessionStore: SessionService = new SessionService(kvStore);
 
 export async function execute(
   operation: ASTNode,
@@ -47,6 +47,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await clearDB();
+  kvMockStorage.sessions = {};
 });
 
 afterAll(async () => {
