@@ -29,6 +29,7 @@
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.13",
     "pg": "^8.11.3",
+    "redis": "^4.6.15",
     "reflect-metadata": "^0.1.14",
     "sqlite3": "^5.1.6",
     "ts-dotenv": "^0.9.1",

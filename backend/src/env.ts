@@ -16,4 +16,5 @@ export default load({
   SMTP_PASS: String,
   EMAIL_FROM: String,
   FRONTEND_URL: String,
+  KVSTORE_HOST: String,
 });
