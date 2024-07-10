@@ -14,6 +14,11 @@ services:
     ports:
       - 5432:5432
 
+  kvStore:
+    image: valkey/valkey:7.2.5-alpine3.19
+    stop_grace_period: 0s
+    command: valkey-server --save 1 1 --loglevel warning
+
   backend:
     stop_grace_period: 0s
     env_file:
@@ -24,9 +29,10 @@ services:
     volumes:
       - ../backend/src:/app/src
     environment:
-      - DB_HOST=testDB
+      DB_HOST: testDB
+      KVSTORE_HOST: ${KVSTORE_HOST:-kvStore}
     healthcheck:
-      test: 'curl --fail --request GET -H ''content-type:application/json'' --url ''http://localhost:4001/graphql?query=%7B__typename%7D'''
+      test: "curl --fail --request GET -H 'content-type:application/json' --url 'http://localhost:4001/graphql?query=%7B__typename%7D'"
       interval: 1s
       timeout: 2s
       retries: 30
@@ -36,7 +42,7 @@ services:
 
   client:
     stop_grace_period: 0s
-    build: '../frontend'
+    build: "../frontend"
     environment:
       - NEXT_PUBLIC_GRAPHQL_API_URL=http://localhost:4001
     ports:
