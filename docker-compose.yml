@@ -48,4 +48,7 @@ services:
     stop_grace_period: 0s
     command: valkey-server --save 1 1 --loglevel warning
     volumes:
-      - prodKVStore:/data
+      - devKVStore:/data
+
+volumes:
+  devKVStore:
