@@ -72,6 +72,8 @@ class UserResolver {
       { expiresIn: "30d" }
     );
 
+    await ctx.sessionStore.setUser(existingUser);
+
     ctx.res.cookie("token", token, {
       httpOnly: true,
       maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -79,6 +81,14 @@ class UserResolver {
     });
 
     return token;
+  }
+
+  @Mutation(() => String)
+  async logout(@Ctx() ctx: Context) {
+    if (ctx?.currentUser?.id)
+      await ctx.sessionStore.delUser(ctx?.currentUser?.id);
+    ctx.res.clearCookie("token");
+    return "ok";
   }
 
   @Authorized()
@@ -89,12 +99,6 @@ class UserResolver {
       where: { id: ctx.currentUser.id },
       relations: { ads: true },
     });
-  }
-
-  @Mutation(() => String)
-  async logout(@Ctx() ctx: Context) {
-    ctx.res.clearCookie("token");
-    return "ok";
   }
 
   @Authorized()

@@ -16,6 +16,7 @@ services:
   backend:
     stop_grace_period: 0s
     environment:
+      KVSTORE_HOST: ${KVSTORE_HOST:-kvStore}
       DB_HOST: db
       DB_PASS: ${DB_PASS-postgres}
       DB_PORT: ${DB_PORT-5432}
@@ -67,8 +68,17 @@ services:
     environment:
       - BOT_TOKEN=${BOT_TOKEN:-}
       - CHANNEL_ID=${CHANNEL_ID:-}
+
     command: "npm run send-message 'production env has been updated : https://pierre.wns.wilders.dev'"
+
+  kvStore:
+    image: valkey/valkey:7.2.5-alpine3.19
+    stop_grace_period: 0s
+    command: valkey-server --save 1 1 --loglevel warning
+    volumes:
+      - prodKVStore:/data
 
 volumes:
   prodDB:
   prodUploads:
+  prodKVStore:

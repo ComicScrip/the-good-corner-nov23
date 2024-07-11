@@ -9,6 +9,8 @@ import express from "express";
 import http from "http";
 import cors from "cors";
 import { Context } from "./types";
+import { SessionService } from "./services/SessionService";
+import kvStorePromise from "./kvStore";
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -17,6 +19,10 @@ const { SERVER_PORT: port } = env;
 
 schemaIsBuilt.then(async (schema) => {
   await db.initialize();
+
+  const kvStore = await kvStorePromise;
+  const sessionStore = new SessionService(kvStore);
+
   const server = new ApolloServer<Context>({
     schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
@@ -30,7 +36,7 @@ schemaIsBuilt.then(async (schema) => {
     }),
     express.json(),
     expressMiddleware(server, {
-      context: async ({ req, res }) => ({ req, res }),
+      context: async ({ req, res }) => ({ req, res, sessionStore }),
     })
   );
   await new Promise<void>((resolve) => httpServer.listen({ port }, resolve));
