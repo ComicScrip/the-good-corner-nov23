@@ -58,7 +58,7 @@ fi
 choose_from_menu "Please choose which backup to restore from :" CURRENT_BACKUP_FOLDER "${BACKUPS[@]}"
 echo "Restoring from $CURRENT_BACKUP_FOLDER backup folder..."
 
-FOLDER="$BACKUPS_FOLDER/$$CURRENT_BACKUP_FOLDER"
+FOLDER="$BACKUPS_FOLDER/$CURRENT_BACKUP_FOLDER"
 
 echo "Restoring DB..."
 cat $FOLDER/dump.sql | docker exec -i $DB_CONTAINER_NAME psql -U $DB_USERNAME -d $DB_NAME
