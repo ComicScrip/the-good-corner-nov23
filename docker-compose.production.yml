@@ -1,5 +1,6 @@
 services:
   db:
+    container_name: prod-db-1
     image: postgres:15-alpine
     stop_grace_period: 0s
     environment:
@@ -44,6 +45,7 @@ services:
     image: scrip/the-good-corner-nov23-front
 
   upload-service:
+    container_name: prod-upload-service-1
     environment:
       - HOST=/
     stop_grace_period: 0s

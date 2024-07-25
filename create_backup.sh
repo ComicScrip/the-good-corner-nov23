@@ -1,0 +1,12 @@
+#!/bin/bash
+
+CONTAINER_NAME="prod-db-1"
+DB_USERNAME="postgres"
+BACKUPS_FOLDER="./.backups"
+CURRENT_BACKUP_FOLDER=$DUMPS_FOLDER/`date +%Y-%m-%d"_"%H-%M-%S`
+RCLONE_REMOTE_NAME="idrive"
+RCLONE_REMOTE_FOLDER="tgc-backups"
+
+mkdir -p $CURRENT_BACKUP_FOLDER
+docker exec $CONTAINER_NAME pg_dumpall -c -U $DB_USERNAME > $CURRENT_BACKUP_FOLDER/dump.sql
+rclone sync $BACKUPS_FOLDER  $RCLONE_REMOTE_NAME:$RCLONE_REMOTE_FOLDER
