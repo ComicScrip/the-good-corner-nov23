@@ -40,13 +40,13 @@ UPLOADS_CONTAINER_NAME="prod-upload-service-1"
 DB_USERNAME="postgres"
 DB_NAME="postgres"
 BACKUPS_FOLDER=".backups"
-CURRENT_BACKUP_FOLDER=2024-07-25_13-43-21
+CURRENT_BACKUP_FOLDER=""
 RCLONE_REMOTE_NAME="idrive"
 RCLONE_REMOTE_FOLDER="tgc-backups"
 
 echo "syncing from remote to local..."
-
 rclone sync $RCLONE_REMOTE_NAME:$RCLONE_REMOTE_FOLDER $BACKUPS_FOLDER
+
 
 BACKUPS=($(ls $BACKUPS_FOLDER | sort -r))
 
