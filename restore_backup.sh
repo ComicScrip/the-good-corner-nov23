@@ -48,9 +48,14 @@ echo "syncing from remote to local..."
 
 rclone sync $RCLONE_REMOTE_NAME:$RCLONE_REMOTE_FOLDER $BACKUPS_FOLDER
 
-backups=($(ls $BACKUPS_FOLDER | sort -r))
+BACKUPS=($(ls $BACKUPS_FOLDER | sort -r))
 
-choose_from_menu "Please make a choice:" CURRENT_BACKUP_FOLDER "${backups[@]}"
+if [ ${#BACKUPS[@]} -eq 0 ]; then
+    echo "No backups available..."
+    exit 1
+fi
+
+choose_from_menu "Please make a choice:" CURRENT_BACKUP_FOLDER "${BACKUPS[@]}"
 echo "Restoring from $CURRENT_BACKUP_FOLDER backup folder..."
 
 FOLDER="$BACKUPS_FOLDER/$$CURRENT_BACKUP_FOLDER"
