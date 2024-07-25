@@ -55,7 +55,7 @@ if [ ${#BACKUPS[@]} -eq 0 ]; then
     exit 1
 fi
 
-choose_from_menu "Please make a choice:" CURRENT_BACKUP_FOLDER "${BACKUPS[@]}"
+choose_from_menu "Please choose which backup to restore from :" CURRENT_BACKUP_FOLDER "${BACKUPS[@]}"
 echo "Restoring from $CURRENT_BACKUP_FOLDER backup folder..."
 
 FOLDER="$BACKUPS_FOLDER/$$CURRENT_BACKUP_FOLDER"
