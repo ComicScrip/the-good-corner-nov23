@@ -44,17 +44,21 @@ CURRENT_BACKUP_FOLDER=2024-07-25_13-43-21
 RCLONE_REMOTE_NAME="idrive"
 RCLONE_REMOTE_FOLDER="tgc-backups"
 
-
 echo "syncing from remote to local..."
 
 rclone sync $RCLONE_REMOTE_NAME:$RCLONE_REMOTE_FOLDER $BACKUPS_FOLDER
 
-backups=($(ls .backups/ | sort -r))
+backups=($(ls $BACKUPS_FOLDER | sort -r))
 
 choose_from_menu "Please make a choice:" CURRENT_BACKUP_FOLDER "${backups[@]}"
 echo "Restoring from $CURRENT_BACKUP_FOLDER backup folder..."
 
-cat dump.sql | docker exec -i $DB_CONTAINER_NAME psql -U $DB_USERNAME -d $DB_NAME
-docker cp $CURRENT_BACKUP_FOLDER/files $UPLOADS_CONTAINER_NAME:/app
+FOLDER="$BACKUPS_FOLDER/$$CURRENT_BACKUP_FOLDER"
+
+echo "Restoring DB..."
+cat $FOLDER/dump.sql | docker exec -i $DB_CONTAINER_NAME psql -U $DB_USERNAME -d $DB_NAME
+
+echo "Restoring files..."
+docker cp $FOLDER/files $UPLOADS_CONTAINER_NAME:/app
 
 echo "done !"
