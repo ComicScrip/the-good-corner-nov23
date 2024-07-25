@@ -2,8 +2,8 @@
 
 CONTAINER_NAME="prod-db-1"
 DB_USERNAME="postgres"
-BACKUPS_FOLDER="./.backups"
-CURRENT_BACKUP_FOLDER=$DUMPS_FOLDER/`date +%Y-%m-%d"_"%H-%M-%S`
+BACKUPS_FOLDER=".backups"
+CURRENT_BACKUP_FOLDER=$BACKUPS_FOLDER/`date +%Y-%m-%d"_"%H-%M-%S`
 RCLONE_REMOTE_NAME="idrive"
 RCLONE_REMOTE_FOLDER="tgc-backups"
 
