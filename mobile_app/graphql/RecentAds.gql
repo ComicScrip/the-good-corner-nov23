@@ -1,0 +1,8 @@
+query RecentAds {
+  ads {
+    id
+    title
+    price
+    picture
+  }
+}
