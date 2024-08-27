@@ -8,5 +8,9 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "nanoid": "^5.0.7",
+    "react-native-get-random-values": "^1.11.0"
+  }
 }
